@@ -50,9 +50,21 @@
           $scope.documentationCollapsed = true;
         }
 
-        if ($scope.src) {
-          ramlParserWrapper.load($scope.src);
-        }
+        $attrs.$observe('src', function(value) {
+            var loadtemp = function(file) {
+                if ($scope.src !== undefined && $scope.src !== "") {
+                    $scope.loaded = false;
+                    ramlParserWrapper.load($scope.src);
+                }
+            }
+
+            //This is needed to avoid an angular "digest in progress" error.
+            if (!$scope.loaded) {
+                setTimeout(loadtemp(value), 250);
+            } else {
+                loadtemp(value);
+            }
+        });
 
         $scope.readResourceTraits = function readResourceTraits(traits) {
           var list = [];
