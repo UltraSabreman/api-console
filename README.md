@@ -1,8 +1,11 @@
+This is a modification of the [RAML Console Prject](https://github.com/mulesoft/api-console) designed to suite the needs of our special project. Modifications are listed bellow:
+* Allow the console to detect changes to it's 'src' attribute and reload the RAML files accordingly.
+
 # RAML Console
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/mulesoft/api-console?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/mulesoft/api-console.png)](https://travis-ci.org/mulesoft/api-console) [![Dependency Status](https://david-dm.org/mulesoft/api-console.png)](https://david-dm.org/mulesoft/api-console#info=dependencies) 
+[![Build Status](https://travis-ci.org/mulesoft/api-console.png)](https://travis-ci.org/mulesoft/api-console) [![Dependency Status](https://david-dm.org/mulesoft/api-console.png)](https://david-dm.org/mulesoft/api-console#info=dependencies)
 [![DevDependency Status](https://david-dm.org/mulesoft/api-console/dev-status.png)](https://david-dm.org/mulesoft/api-console#info=devDependencies) [![npm version](https://badge.fury.io/js/api-console.svg)](https://badge.fury.io/js/api-console) [![Bower version](https://badge.fury.io/bo/api-console.svg)](https://badge.fury.io/bo/api-console)
 
 An API console for [RAML](http://raml.org) (Restful Api Modeling Language) documents. The RAML Console allows browsing of API documentation and in-browser testing of API methods.
@@ -83,7 +86,7 @@ Given the above, OAuth 2 requests would redirect back to that URL.
 
 ### Single View Mode
 
-In *Single View* mode you will be able to see only documentation or try-it. 
+In *Single View* mode you will be able to see only documentation or try-it.
 
     <raml-console src="path-to-raml" single-view></raml-console>
 
@@ -168,8 +171,7 @@ To run tests, you'll need the following:
 ### Running Tests
 
     $ grunt regression
-    
+
 ## Contributor's Agreement
 
-To contribute source code to this repository, please read our [contributor's agreement](http://www.mulesoft.org/legal/contributor-agreement.html), and then execute it by running this notebook and following the instructions: https://api-notebook.anypoint.mulesoft.com/notebooks/#380297ed0e474010ff43 
-
+To contribute source code to this repository, please read our [contributor's agreement](http://www.mulesoft.org/legal/contributor-agreement.html), and then execute it by running this notebook and following the instructions: https://api-notebook.anypoint.mulesoft.com/notebooks/#380297ed0e474010ff43
