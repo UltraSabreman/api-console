@@ -573,10 +573,13 @@
             if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
-            $scope.checkIfExpanded();
+            if (!$rootScope.searchDone) {
+                $scope.checkIfExpanded();
+            }
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
+        //TODO: if found, reset location so we dont look again.
         $scope.checkIfExpanded = function() {
             var loc = $location.search();
             var target;
@@ -594,6 +597,7 @@
             }
             if ($scope.resource.toString() === target) {
                 $scope.showResource({currentTarget: $scope.ourButtons[index]}, index);
+                $rootScope.searchDone = true;
             }
         };
       }]
@@ -1782,14 +1786,14 @@
     .directive('resourceType', RAML.Directives.resourceType);
 })();
 
-//TODO: is there a better location for this?
+/*//Used for debugging and modifigin outside of another project.
 angular.module('RAML.Directives').config(function($locationProvider) {
     'use strict';
   $locationProvider.html5Mode( {
       enabled: true,
       requireBase: false
     });
-});
+});*/
 (function () {
   'use strict';
 
@@ -1801,7 +1805,7 @@ angular.module('RAML.Directives').config(function($locationProvider) {
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', function($scope, $window, $attrs) {
+      controller: ['$scope', '$window', '$attrs', '$rootScope', '$location', function($scope, $window, $attrs, $rootScope, $location) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -1951,6 +1955,14 @@ angular.module('RAML.Directives').config(function($locationProvider) {
             }, 10);
           }
         });
+
+        $scope.checkSearch = function(isLast) {
+            if (!isLast) { return; }
+            //here we set searchDone to true no matter what, since we dont want subsiquent raml changes
+            //to search.
+            $rootScope.searchDone = true;
+            $location.url($location.path());
+        };
       }],
       link: function($scope) {
         ramlParserWrapper.onParseSuccess(function(raml) {
@@ -6674,7 +6686,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "\n" +
     "\r" +
     "\n" +
-    "          <li id=\"{{generateId(resource.pathSegments)}}\" class=\"raml-console-resource-list-item\" ng-repeat=\"resource in resourceGroup\" ng-if=\"!$first\">\r" +
+    "          <li id=\"{{generateId(resource.pathSegments)}}\" class=\"raml-console-resource-list-item\" ng-repeat=\"resource in resourceGroup\" ng-if=\"!$first\" ng-init=\"checkSearch($last)\">\r" +
     "\n" +
     "            <div class=\"raml-console-resource raml-console-clearfix\" ng-class=\"{ 'raml-console-is-active':showPanel }\">\r" +
     "\n" +

@@ -184,10 +184,13 @@
             if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
-            $scope.checkIfExpanded();
+            if (!$rootScope.searchDone) {
+                $scope.checkIfExpanded();
+            }
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
+        //TODO: if found, reset location so we dont look again.
         $scope.checkIfExpanded = function() {
             var loc = $location.search();
             var target;
@@ -205,6 +208,7 @@
             }
             if ($scope.resource.toString() === target) {
                 $scope.showResource({currentTarget: $scope.ourButtons[index]}, index);
+                $rootScope.searchDone = true;
             }
         };
       }]

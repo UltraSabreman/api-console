@@ -1,11 +1,11 @@
-//TODO: is there a better location for this?
+/*//Used for debugging and modifigin outside of another project.
 angular.module('RAML.Directives').config(function($locationProvider) {
     'use strict';
   $locationProvider.html5Mode( {
       enabled: true,
       requireBase: false
     });
-});
+});*/
 (function () {
   'use strict';
 
@@ -17,7 +17,7 @@ angular.module('RAML.Directives').config(function($locationProvider) {
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', function($scope, $window, $attrs) {
+      controller: ['$scope', '$window', '$attrs', '$rootScope', '$location', function($scope, $window, $attrs, $rootScope, $location) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -167,6 +167,14 @@ angular.module('RAML.Directives').config(function($locationProvider) {
             }, 10);
           }
         });
+
+        $scope.checkSearch = function(isLast) {
+            if (!isLast) { return; }
+            //here we set searchDone to true no matter what, since we dont want subsiquent raml changes
+            //to search.
+            $rootScope.searchDone = true;
+            $location.url($location.path());
+        };
       }],
       link: function($scope) {
         ramlParserWrapper.onParseSuccess(function(raml) {
