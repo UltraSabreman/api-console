@@ -1,3 +1,11 @@
+//TODO: is there a better location for this?
+angular.module('RAML.Directives').config(function($locationProvider) {
+    'use strict';
+  $locationProvider.html5Mode( {
+      enabled: true,
+      requireBase: false
+    });
+});
 (function () {
   'use strict';
 

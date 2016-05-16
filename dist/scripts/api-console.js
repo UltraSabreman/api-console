@@ -395,7 +395,7 @@
       restrict: 'E',
       templateUrl: 'directives/method-list.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', '$rootScope', function($scope, $timeout, $rootScope) {
+      controller: ['$scope', '$timeout', '$rootScope', '$location', function($scope, $timeout, $rootScope, $location) {
         function loadExamples () {
           $scope.context.uriParameters.reset($scope.resource.uriParametersForDocumentation);
           $scope.context.queryParameters.reset($scope.methodInfo.queryParameters);
@@ -566,6 +566,35 @@
             jQuery($this).addClass('raml-console-is-active');
             jQuery($this).siblings('.raml-console-tab').removeClass('raml-console-is-active');
           }
+        };
+
+        //This function is ran to get the only method tabs that are appropriate to our spesific method.
+        $scope.init = function(last) {
+            if(!last) { return; }
+            $scope.ourButtons = jQuery('.raml-console-init-tab');
+            $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
+            $scope.checkIfExpanded();
+        };
+
+        //This fucntions checks to see if we need to exapnd one of these tabs.
+        $scope.checkIfExpanded = function() {
+            var loc = $location.search();
+            var target;
+            if (loc.hasOwnProperty('method')) {
+                target = loc.method;
+            } else {
+                return;
+            }
+            var index = 0;
+            if (loc.hasOwnProperty('index')) {
+                index = loc.index;
+                if (index > $scope.ourButtons.length - 1) {
+                    index = $scope.ourButtons.length - 1;
+                }
+            }
+            if ($scope.resource.toString() === target) {
+                $scope.showResource({currentTarget: $scope.ourButtons[index]}, index);
+            }
         };
       }]
     };
@@ -1753,6 +1782,14 @@
     .directive('resourceType', RAML.Directives.resourceType);
 })();
 
+//TODO: is there a better location for this?
+angular.module('RAML.Directives').config(function($locationProvider) {
+    'use strict';
+  $locationProvider.html5Mode( {
+      enabled: true,
+      requireBase: false
+    });
+});
 (function () {
   'use strict';
 
@@ -5629,9 +5666,17 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
   $templateCache.put('directives/method-list.tpl.html',
     "<div class=\"raml-console-tab-list\">\r" +
     "\n" +
-    "  <div class=\"raml-console-tab\" ng-repeat=\"method in resource.methods\" ng-click=\"showResource($event, $index)\">\r" +
+    "  <!-- Here we call the init function in our controller after every tab is created, though it's actually only ever ran once, on the last tab\r" +
     "\n" +
-    "    <span class=\"raml-console-tab-label raml-console-tab-{{method.method}}\">{{method.method.toLocaleUpperCase()}}</span>\r" +
+    "       This ensures that all of the tabs are fully created.\r" +
+    "\n" +
+    "       This addition (and the addition/removal of the \"raml-console-init-tab\" class) is nesseary to make it possible for us\r" +
+    "\n" +
+    "       to expand the appropriate method.-->\r" +
+    "\n" +
+    "  <div class=\"raml-console-tab raml-console-init-tab\" ng-repeat=\"method in resource.methods\" ng-click=\"showResource($event, $index)\" >\r" +
+    "\n" +
+    "    <span class=\"raml-console-tab-label raml-console-tab-{{method.method}}\" ng-init=\"init($last)\">{{method.method.toLocaleUpperCase()}}</span>\r" +
     "\n" +
     "  </div>\r" +
     "\n" +
