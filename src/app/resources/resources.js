@@ -1,11 +1,3 @@
-/*//Used for debugging and modifigin outside of another project.
-angular.module('RAML.Directives').config(function($locationProvider) {
-    'use strict';
-  $locationProvider.html5Mode( {
-      enabled: true,
-      requireBase: false
-    });
-});*/
 (function () {
   'use strict';
 

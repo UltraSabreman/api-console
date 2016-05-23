@@ -195,7 +195,7 @@
             var loc = $location.search();
             var target;
             if (loc.hasOwnProperty('method')) {
-                target = loc.method;
+                target = decodeURIComponent(loc.method);
             } else {
                 return;
             }

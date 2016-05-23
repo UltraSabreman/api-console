@@ -62,6 +62,14 @@
     }
   };
 })(window);
+/*//Used for debugging and modifigin outside of another project.
+ angular.module('RAML.Directives').config(function($locationProvider) {
+   'use strict';
+   $locationProvider.html5Mode( {
+     enabled: true,
+     requireBase: false
+   });
+ });*/
 
 (function () {
   'use strict';
@@ -584,7 +592,7 @@
             var loc = $location.search();
             var target;
             if (loc.hasOwnProperty('method')) {
-                target = loc.method;
+                target = decodeURIComponent(loc.method);
             } else {
                 return;
             }
@@ -1786,14 +1794,6 @@
     .directive('resourceType', RAML.Directives.resourceType);
 })();
 
-/*//Used for debugging and modifigin outside of another project.
-angular.module('RAML.Directives').config(function($locationProvider) {
-    'use strict';
-  $locationProvider.html5Mode( {
-      enabled: true,
-      requireBase: false
-    });
-});*/
 (function () {
   'use strict';
 
