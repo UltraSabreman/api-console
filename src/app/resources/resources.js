@@ -176,6 +176,9 @@
           $scope.resourceList = [];
           $scope.documentList = [];
 
+          //TODO: do we want to make this recursive like it was before?
+          //$scope.raml.resourceGroups[0] = $scope.raml.resourceGroups[0].slice(1);
+
           for (var i = 0; i < $scope.raml.resourceGroups.length; i++) {
             var resources = $scope.raml.resourceGroups[i];
             var status = resources.length > 1 ? false : null;

@@ -596,17 +596,27 @@
             } else {
                 return;
             }
-            var index = 0;
-            if (loc.hasOwnProperty('index')) {
-                index = loc.index;
-                if (index > $scope.ourButtons.length - 1) {
-                    index = $scope.ourButtons.length - 1;
-                }
+            var type = '';
+            if (loc.hasOwnProperty('type')) {
+                type = loc.type;
             }
-            if ($scope.resource.toString() === target) {
-                $scope.showResource({currentTarget: $scope.ourButtons[index]}, index);
-                $rootScope.searchDone = true;
+            var foundIndex = -1;
+
+            for (var i = 0; i < $scope.resource.methods.length; i++) {
+              if ($scope.resource.methods[i].method.toLowerCase() === type.toLowerCase()) {
+                foundIndex = i;
+                break;
+              }
             }
+
+            if (foundIndex !== -1 && $scope.resource.toString() === target) {
+              $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
+              //TODO: is there a better approach
+              jQuery($scope.ourButtons[foundIndex]).attr('id', 'moveTabThing');
+
+              $rootScope.searchDone = true;
+            }
+
         };
       }]
     };
@@ -1972,6 +1982,9 @@
           $scope.resourceList = [];
           $scope.documentList = [];
 
+          //TODO: do we want to make this recursive like it was before?
+          $scope.raml.resourceGroups[0] = $scope.raml.resourceGroups[0].slice(1);
+
           for (var i = 0; i < $scope.raml.resourceGroups.length; i++) {
             var resources = $scope.raml.resourceGroups[i];
             var status = resources.length > 1 ? false : null;
@@ -1979,7 +1992,7 @@
           }
 
           if ($scope.raml.documentation) {
-            for (var j = 0; j < $scope.raml.documentation.length; j++) {
+            for (var j = 1; j < $scope.raml.documentation.length; j++) {
               $scope.documentList.push($scope.documentationCollapsed ? true : false);
             }
           }
