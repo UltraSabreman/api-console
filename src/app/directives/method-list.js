@@ -184,9 +184,7 @@
             if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
-            if (!$rootScope.searchDone) {
-                $scope.checkIfExpanded();
-            }
+            $scope.checkIfExpanded();
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.

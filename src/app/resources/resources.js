@@ -9,7 +9,7 @@
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', '$rootScope', '$location', function($scope, $window, $attrs, $rootScope, $location) {
+      controller: ['$scope', '$window', '$attrs', /*'$rootScope', '$location',*/ function($scope, $window, $attrs/*, $rootScope, $location*/) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -164,8 +164,7 @@
             if (!isLast) { return; }
             //here we set searchDone to true no matter what, since we dont want subsiquent raml changes
             //to search.
-            $rootScope.searchDone = true;
-            $location.url($location.path());
+            //$location.url($location.path());
         };
       }],
       link: function($scope) {

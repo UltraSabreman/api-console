@@ -581,9 +581,7 @@
             if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
-            if (!$rootScope.searchDone) {
-                $scope.checkIfExpanded();
-            }
+            $scope.checkIfExpanded();
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
@@ -1815,7 +1813,7 @@
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', '$rootScope', '$location', function($scope, $window, $attrs, $rootScope, $location) {
+      controller: ['$scope', '$window', '$attrs', /*'$rootScope', '$location',*/ function($scope, $window, $attrs/*, $rootScope, $location*/) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -1970,8 +1968,7 @@
             if (!isLast) { return; }
             //here we set searchDone to true no matter what, since we dont want subsiquent raml changes
             //to search.
-            $rootScope.searchDone = true;
-            $location.url($location.path());
+            //$location.url($location.path());
         };
       }],
       link: function($scope) {
@@ -1983,7 +1980,7 @@
           $scope.documentList = [];
 
           //TODO: do we want to make this recursive like it was before?
-          $scope.raml.resourceGroups[0] = $scope.raml.resourceGroups[0].slice(1);
+          //$scope.raml.resourceGroups[0] = $scope.raml.resourceGroups[0].slice(1);
 
           for (var i = 0; i < $scope.raml.resourceGroups.length; i++) {
             var resources = $scope.raml.resourceGroups[i];
@@ -1992,7 +1989,7 @@
           }
 
           if ($scope.raml.documentation) {
-            for (var j = 1; j < $scope.raml.documentation.length; j++) {
+            for (var j = 0; j < $scope.raml.documentation.length; j++) {
               $scope.documentList.push($scope.documentationCollapsed ? true : false);
             }
           }
