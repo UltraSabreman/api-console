@@ -491,6 +491,7 @@
         });
 
         $scope.showResource = function ($event, $index) {
+          $scope.updateUrl($index);
           var $this             = jQuery($event.currentTarget);
           var $resource         = $this.closest('.raml-console-resource');
           var methodInfo        = $scope.resource.methods[$index];
@@ -583,6 +584,20 @@
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
             $scope.checkIfExpanded();
         };
+
+        $scope.updateUrl = function(index) {
+          var search = $location.search();
+          var newLocation = {};
+          Object.keys(search).forEach(function(key) {
+            if (search.hasOwnProperty(key) && typeof key === 'string') {
+              newLocation[key] = search[key];
+            }
+          });
+
+          newLocation['method'] = $scope.resource.toString();
+          newLocation['type'] = $scope.resource.methods[index].method.toLowerCase()
+          $location.path($location.path()).search(newLocation);
+        }
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
         //TODO: if found, reset location so we dont look again.
