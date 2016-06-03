@@ -6,7 +6,7 @@
       restrict: 'E',
       templateUrl: 'directives/method-list.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', '$rootScope', '$location', function($scope, $timeout, $rootScope, $location) {
+      controller: ['$scope', '$timeout', '$rootScope', '$location', '$anchorScroll', function($scope, $timeout, $rootScope, $location, $anchorScroll) {
         function loadExamples () {
           $scope.context.uriParameters.reset($scope.resource.uriParametersForDocumentation);
           $scope.context.queryParameters.reset($scope.methodInfo.queryParameters);
@@ -164,9 +164,10 @@
             $scope.showPanel = true;
 
             $timeout(function () {
-              jQuery('html, body').animate({
-                scrollTop: jQuery('#'+hash).offset().top + 'px'
-              }, 'fast');
+              $location.hash(hash);
+
+              // call $anchorScroll()
+              $anchorScroll();
             }, 10);
 
           } else if (jQuery($this).hasClass('raml-console-is-active')) {
@@ -197,10 +198,10 @@
             }
           });
 
-          newLocation['method'] = $scope.resource.toString();
-          newLocation['type'] = $scope.resource.methods[index].method.toLowerCase()
+          newLocation.method = $scope.resource.toString();
+          newLocation.type = $scope.resource.methods[index].method.toLowerCase();
           $location.path($location.path()).search(newLocation);
-        }
+        };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
         //TODO: if found, reset location so we dont look again.
@@ -227,12 +228,7 @@
 
             if (foundIndex !== -1 && $scope.resource.toString() === target) {
               $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
-              //TODO: is there a better approach
-              jQuery($scope.ourButtons[foundIndex]).attr('id', 'moveTabThing');
-
-              $rootScope.searchDone = true;
             }
-
         };
       }]
     };
