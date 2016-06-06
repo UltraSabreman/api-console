@@ -57,7 +57,7 @@
         <li class="raml-console-documentation-scheme" ng-class="{'raml-console-is-active':isSchemeSelected(value)}" ng-click="selectDocumentationScheme(value)" ng-repeat="(key, value) in securitySchemes">{{value.name}}</li>
       </ol>
 
-      <p ng-if"documentationSchemeSelected.description" markdown="documentationSchemeSelected.description" class="raml-console-marked-content"></p>
+      <p ng-if="documentationSchemeSelected.description" markdown="documentationSchemeSelected.description" class="raml-console-marked-content"></p>
 
       <section class="raml-console-resource-section raml-console-scheme-headers" ng-if="documentationSchemeSelected.describedBy.headers">
         <h4 class="raml-console-resource-heading-a">Headers</h4>
@@ -130,12 +130,25 @@
 
       <div ng-if="methodInfo.body[currentBodySelected].example">
         <span>Example:</span>
-        <pre class="raml-console-resource-pre"><code class="raml-console-hljs" hljs source="getBeatifiedExample(methodInfo.body[currentBodySelected].example)"></code></pre>
+          <div class="raml-console-resource-pre" ui-codemirror="{
+            lineNumbers: true,
+            tabSize: 2,
+            mode: currentBodySelected,
+            gutters: ['CodeMirror-lint-markers'],
+            theme : 'raml-console'
+          }" ng-model="methodInfo.body[currentBodySelected].example"></div>
       </div>
 
       <div class="raml-console-schema-container" ng-if="methodInfo.body[currentBodySelected].schema">
-        <p><button ng-click="showSchema($event)" class="raml-console-resource-btn">Show Schema</button></p>
-        <pre class="raml-console-resource-pre raml-console-resource-pre-toggle"><code class="raml-console-hljs" hljs source="getBeatifiedExample(methodInfo.body[currentBodySelected].schema)"></code></pre>
+        <p><button ng-click="showSchema($event); refreshCodeMirror()" class="raml-console-resource-btn">Show Schema</button></p>
+          <div  class="raml-console-resource-pre raml-console-resource-pre-toggle" ui-codemirror="{
+            lineNumbers: true,
+            tabSize: 2,
+            mode: currentBodySelected,
+            gutters: ['CodeMirror-lint-markers'],
+            theme : 'raml-console'
+          }" ng-model="methodInfo.body[currentBodySelected].schema"></div>
+
       </div>
     </section>
   </div>
@@ -183,16 +196,33 @@
 
           <div ng-if="responseInfo[code][responseInfo[code].currentType].example">
             <span>Example:</span>
-            <pre class="raml-console-resource-pre"><code class="raml-console-hljs" hljs source="getBeatifiedExample(responseInfo[code][responseInfo[code].currentType].example)"></code></pre>
+            <div  class="raml-console-resource-pre" ui-codemirror="{
+                lineNumbers: true,
+                tabSize: 2,
+                mode: responseInfo[code].currentType,
+                gutters: ['CodeMirror-lint-markers'],
+                theme : 'raml-console'
+              }" ng-model="responseInfo[code][responseInfo[code].currentType].example">
+            </div>
           </div>
 
           <div class="raml-console-schema-container" ng-if="responseInfo[code][responseInfo[code].currentType].schema">
             <p><button ng-click="showSchema($event)" class="raml-console-resource-btn">Show Schema</button></p>
-            <pre class="raml-console-resource-pre raml-console-resource-pre-toggle"><code class="raml-console-hljs" hljs source="getBeatifiedExample(responseInfo[code][responseInfo[code].currentType].schema)"></code></pre>
-          </div>
+            <div  class="raml-console-resource-pre raml-console-resource-pre-toggle" ui-codemirror="{
+              lineNumbers: true,
+              tabSize: 2,
+              mode: responseInfo[code].currentType,
+              gutters: ['CodeMirror-lint-markers'],
+              theme : 'raml-console'
+            }" ng-model="responseInfo[code][responseInfo[code].currentType].schema">
+
+            </div>
         </div>
       </section>
+
 
     </div>
   </div>
 </div>
+
+

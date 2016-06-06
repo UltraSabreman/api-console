@@ -51,19 +51,16 @@
         }
 
         $attrs.$observe('src', function() {
-            var loadtemp = function() {
-                if ($scope.src !== undefined && $scope.src !== '') {
-                    $scope.loaded = false;
-                    ramlParserWrapper.load($scope.src);
-                }
-            };
-
-            //This is needed to avoid an angular "digest in progress" error.
-            if (!$scope.loaded) {
-                setTimeout(loadtemp(), 250);
-            } else {
-                loadtemp();
+          var loadtemp = function() {
+            if ($scope.src !== undefined && $scope.src !== '') {
+              $scope.loaded = false;
+              $scope.error  = undefined;
+              $scope.errorMessage = undefined;
+              ramlParserWrapper.load($scope.src);
             }
+          };
+
+          setTimeout(loadtemp());
         });
 
         $scope.readResourceTraits = function readResourceTraits(traits) {

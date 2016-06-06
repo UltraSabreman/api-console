@@ -215,6 +215,12 @@
               .velocity('slideUp');
           }
         };
+
+        $scope.refreshCodeMirror = function() {
+          jQuery('.CodeMirror').each(function(i, el){
+            el.CodeMirror.refresh();
+          });
+        };
       }]
     };
   };

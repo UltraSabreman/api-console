@@ -8,6 +8,8 @@
 }
 .CodeMirror-scroll {
   /* Set scrolling behaviour here */
+  max-height: 500px;
+  resize: both;
   overflow: auto;
 }
 

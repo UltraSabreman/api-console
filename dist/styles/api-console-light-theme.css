@@ -8,6 +8,8 @@
 }
 .CodeMirror-scroll {
   /* Set scrolling behaviour here */
+  max-height: 500px;
+  resize: both;
   overflow: auto;
 }
 
@@ -4773,7 +4775,7 @@ http://ethanschoonover.com/raml-console/img/raml-console-palette.png
   rendering-intent: auto !important;
   position: relative !important;
   background-color: #fff !important;
-  color: #657b83 !important;
+  /*color: #657b83 !important;*/
 }
 
 .cm-s-raml-console .CodeMirror-widget {

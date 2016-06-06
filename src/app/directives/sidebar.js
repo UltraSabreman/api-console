@@ -96,6 +96,7 @@
             catch (e) {
               $scope.response.body = jqXhr.responseText;
             }
+            $scope.response.body += "\n";
           }
 
           $scope.requestEnd      = true;

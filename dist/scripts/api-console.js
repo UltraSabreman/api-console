@@ -342,6 +342,12 @@
               .velocity('slideUp');
           }
         };
+
+        $scope.refreshCodeMirror = function() {
+          jQuery('.CodeMirror').each(function(i, el){
+            el.CodeMirror.refresh();
+          });
+        };
       }]
     };
   };
@@ -1135,6 +1141,7 @@
             catch (e) {
               $scope.response.body = jqXhr.responseText;
             }
+            $scope.response.body += "\n";
           }
 
           $scope.requestEnd      = true;
@@ -1866,19 +1873,16 @@
         }
 
         $attrs.$observe('src', function() {
-            var loadtemp = function() {
-                if ($scope.src !== undefined && $scope.src !== '') {
-                    $scope.loaded = false;
-                    ramlParserWrapper.load($scope.src);
-                }
-            };
-
-            //This is needed to avoid an angular "digest in progress" error.
-            if (!$scope.loaded) {
-                setTimeout(loadtemp(), 250);
-            } else {
-                loadtemp();
+          var loadtemp = function() {
+            if ($scope.src !== undefined && $scope.src !== '') {
+              $scope.loaded = false;
+              $scope.error  = undefined;
+              $scope.errorMessage = undefined;
+              ramlParserWrapper.load($scope.src);
             }
+          };
+
+          setTimeout(loadtemp());
         });
 
         $scope.readResourceTraits = function readResourceTraits(traits) {
@@ -5297,401 +5301,233 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
 
 
   $templateCache.put('directives/documentation.tpl.html',
-    "<div class=\"raml-console-resource-panel-primary\" ng-if=\"documentationEnabled\">\r" +
+    "<div class=\"raml-console-resource-panel-primary\" ng-if=\"documentationEnabled\">\n" +
+    "  <!-- Request -->\n" +
+    "  <header class=\"raml-console-resource-header\">\n" +
+    "    <h3 class=\"raml-console-resource-head\">\n" +
+    "      Request\n" +
+    "    </h3>\n" +
+    "  </header>\n" +
+    "  <div id=\"request-documentation\" class=\"raml-console-resource-panel-primary-row raml-console-resource-panel-content raml-console-is-active\" ng-class=\"{'raml-console-is-active':showRequestDocumentation}\">\n" +
+    "    <h3 class=\"raml-console-resource-heading-a\">Description</h3>\n" +
     "\n" +
-    "  <!-- Request -->\r" +
+    "    <p markdown=\"methodInfo.description\" class=\"raml-console-marked-content\"></p>\n" +
     "\n" +
-    "  <header class=\"raml-console-resource-header\">\r" +
+    "    <section class=\"raml-console-resource-section\" id=\"docs-uri-parameters\" ng-if=\"resource.uriParametersForDocumentation\">\n" +
+    "      <h3 class=\"raml-console-resource-heading-a\">URI Parameters</h3>\n" +
     "\n" +
-    "    <h3 class=\"raml-console-resource-head\">\r" +
+    "      <div class=\"raml-console-resource-param\" id=\"docs-uri-parameters-{{uriParam[0].displayName}}\" ng-repeat=\"uriParam in resource.uriParametersForDocumentation\">\n" +
+    "        <h4 class=\"raml-console-resource-param-heading\">{{uriParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(uriParam[0])}}</span></h4>\n" +
+    "        <p markdown=\"uriParam[0].description\" class=\"raml-console-marked-content\"></p>\n" +
     "\n" +
-    "      Request\r" +
+    "        <p ng-if=\"uriParam[0].example !== undefined\">\n" +
+    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{uriParam[0].example}}</span>\n" +
+    "        </p>\n" +
+    "      </div>\n" +
+    "    </section>\n" +
     "\n" +
-    "    </h3>\r" +
+    "    <section class=\"raml-console-resource-section\" id=\"docs-headers\" ng-if=\"methodInfo.headers.plain\">\n" +
+    "      <h3 class=\"raml-console-resource-heading-a\">Headers</h3>\n" +
     "\n" +
-    "  </header>\r" +
+    "      <div class=\"raml-console-resource-param\" ng-repeat=\"header in methodInfo.headers.plain\" ng-if=\"!header[0].isFromSecurityScheme\">\n" +
+    "        <h4 class=\"raml-console-resource-param-heading\">{{header[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(header[0])}}</span></h4>\n" +
     "\n" +
-    "  <div id=\"request-documentation\" class=\"raml-console-resource-panel-primary-row raml-console-resource-panel-content raml-console-is-active\" ng-class=\"{'raml-console-is-active':showRequestDocumentation}\">\r" +
+    "        <p markdown=\"header[0].description\" class=\"raml-console-marked-content\"></p>\n" +
     "\n" +
-    "    <h3 class=\"raml-console-resource-heading-a\">Description</h3>\r" +
+    "        <p ng-if=\"header[0].example !== undefined\">\n" +
+    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{header[0].example}}</span>\n" +
+    "        </p>\n" +
+    "      </div>\n" +
+    "    </section>\n" +
+    "\n" +
+    "    <section class=\"raml-console-resource-section\" id=\"docs-query-parameters\" ng-if=\"methodInfo.queryParameters\">\n" +
+    "      <h3 class=\"raml-console-resource-heading-a\">Query Parameters</h3>\n" +
+    "\n" +
+    "      <div class=\"raml-console-resource-param\" ng-repeat=\"queryParam in methodInfo.queryParameters\" ng-if=\"!queryParam[0].isFromSecurityScheme\">\n" +
+    "        <h4 class=\"raml-console-resource-param-heading\">{{queryParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(queryParam[0])}}</span></h4>\n" +
+    "\n" +
+    "        <p markdown=\"queryParam[0].description\" class=\"raml-console-marked-content\"></p>\n" +
+    "\n" +
+    "        <p ng-if=\"queryParam[0].example !== undefined\">\n" +
+    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{queryParam[0].example}}</span>\n" +
+    "        </p>\n" +
+    "      </div>\n" +
+    "    </section>\n" +
+    "\n" +
+    "    <section class=\"raml-console-resource-section raml-console-documentation-schemes\">\n" +
+    "      <h3 class=\"raml-console-resource-heading-a\">Security Schemes</h3>\n" +
+    "      <ol class=\"raml-console-documentation-security-scheme\">\n" +
+    "        <li class=\"raml-console-documentation-scheme\" ng-class=\"{'raml-console-is-active':isSchemeSelected(value)}\" ng-click=\"selectDocumentationScheme(value)\" ng-repeat=\"(key, value) in securitySchemes\">{{value.name}}</li>\n" +
+    "      </ol>\n" +
+    "\n" +
+    "      <p ng-if=\"documentationSchemeSelected.description\" markdown=\"documentationSchemeSelected.description\" class=\"raml-console-marked-content\"></p>\n" +
+    "\n" +
+    "      <section class=\"raml-console-resource-section raml-console-scheme-headers\" ng-if=\"documentationSchemeSelected.describedBy.headers\">\n" +
+    "        <h4 class=\"raml-console-resource-heading-a\">Headers</h4>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, header) in documentationSchemeSelected.describedBy.headers\">\n" +
+    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(header)}}</span></h4>\n" +
+    "\n" +
+    "          <p markdown=\"header.description\" class=\"raml-console-marked-content\"></p>\n" +
+    "\n" +
+    "          <p ng-if=\"header.example !== undefined\">\n" +
+    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{header.example}}</span>\n" +
+    "          </p>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "\n" +
+    "      <section class=\"raml-console-resource-section raml-console-scheme-query-parameters\" ng-if=\"documentationSchemeSelected.describedBy.queryParameters\">\n" +
+    "        <h4 class=\"raml-console-resource-heading-a\">Query Parameters</h4>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, queryParameter) in documentationSchemeSelected.describedBy.queryParameters\">\n" +
+    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(queryParameter)}}</span></h4>\n" +
+    "\n" +
+    "          <p markdown=\"queryParameter.description\" class=\"raml-console-marked-content\"></p>\n" +
+    "\n" +
+    "          <p ng-if=\"queryParameter.example !== undefined\">\n" +
+    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{queryParameter.example}}</span>\n" +
+    "          </p>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "\n" +
+    "      <section class=\"raml-console-resource-section raml-console-scheme-responses\" ng-if=\"documentationSchemeSelected.describedBy.responses\">\n" +
+    "        <h4 class=\"raml-console-resource-heading-a\">Responses</h4>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(code, info) in documentationSchemeSelected.describedBy.responses\">\n" +
+    "          <h4 class=\"raml-console-resource-param-heading\">{{code}}</h4>\n" +
+    "          <p markdown=\"info.description\" class=\"raml-console-marked-content\"></p>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "\n" +
+    "      <section class=\"raml-console-resource-section raml-console-scheme-settings\" ng-if=\"documentationSchemeSelected.settings\">\n" +
+    "        <h4 class=\"raml-console-resource-heading-a\">Settings</h4>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, config) in documentationSchemeSelected.settings\">\n" +
+    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}</h4>\n" +
+    "          <p>{{schemaSettingsDocumentation(config)}}</p>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "    </section>\n" +
+    "\n" +
+    "\n" +
+    "    <section class=\"raml-console-resource-section\" ng-if=\"methodInfo.body\">\n" +
+    "      <h3 class=\"raml-console-resource-heading-a\">\n" +
+    "        Body\n" +
+    "      </h3>\n" +
+    "\n" +
+    "      <h4 class=\"raml-console-request-body-heading\">\n" +
+    "        <span ng-click=\"changeResourceBodyType($event, key)\" ng-class=\"{ 'raml-console-is-active' : bodySelected(key)}\" class=\"raml-console-flag raml-console-body-{{getBodyId(key)}}\" ng-repeat=\"(key, value) in methodInfo.body\">{{key}}</span>\n" +
+    "      </h4>\n" +
+    "\n" +
+    "      <section ng-if=\"methodInfo.body[currentBodySelected].formParameters\">\n" +
+    "         <div class=\"raml-console-resource-param\" ng-repeat=\"formParam in methodInfo.body[currentBodySelected].formParameters\">\n" +
+    "          <h4 class=\"raml-console-resource-param-heading\">{{formParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(formParam[0])}}</span></h4>\n" +
+    "\n" +
+    "          <p markdown=\"formParam[0].description\" class=\"raml-console-marked-content\"></p>\n" +
+    "\n" +
+    "          <p ng-if=\"formParam[0].example !== undefined\">\n" +
+    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{formParam[0].example}}</span>\n" +
+    "          </p>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "\n" +
+    "      <div ng-if=\"methodInfo.body[currentBodySelected].example\">\n" +
+    "        <span>Example:</span>\n" +
+    "          <div class=\"raml-console-resource-pre\" ui-codemirror=\"{\n" +
+    "            lineNumbers: true,\n" +
+    "            tabSize: 2,\n" +
+    "            mode: currentBodySelected,\n" +
+    "            gutters: ['CodeMirror-lint-markers'],\n" +
+    "            theme : 'raml-console'\n" +
+    "          }\" ng-model=\"methodInfo.body[currentBodySelected].example\"></div>\n" +
+    "      </div>\n" +
+    "\n" +
+    "      <div class=\"raml-console-schema-container\" ng-if=\"methodInfo.body[currentBodySelected].schema\">\n" +
+    "        <p><button ng-click=\"showSchema($event); refreshCodeMirror()\" class=\"raml-console-resource-btn\">Show Schema</button></p>\n" +
+    "          <div  class=\"raml-console-resource-pre raml-console-resource-pre-toggle\" ui-codemirror=\"{\n" +
+    "            lineNumbers: true,\n" +
+    "            tabSize: 2,\n" +
+    "            mode: currentBodySelected,\n" +
+    "            gutters: ['CodeMirror-lint-markers'],\n" +
+    "            theme : 'raml-console'\n" +
+    "          }\" ng-model=\"methodInfo.body[currentBodySelected].schema\"></div>\n" +
+    "\n" +
+    "      </div>\n" +
+    "    </section>\n" +
+    "  </div>\n" +
+    "\n" +
+    "  <!-- Response -->\n" +
+    "  <div ng-if=\"methodInfo.responseCodes\">\n" +
+    "    <header class=\"raml-console-resource-header\">\n" +
+    "      <h3 class=\"raml-console-resource-head\">\n" +
+    "        Response\n" +
+    "      </h3>\n" +
+    "    </header>\n" +
+    "\n" +
+    "    <div class=\"raml-console-resource-response-jump\">\n" +
+    "      <ul class=\"raml-console-resource-menu\">\n" +
+    "        <li class=\"raml-console-resource-btns raml-console-resource-menu-item\" ng-repeat=\"code in methodInfo.responseCodes\">\n" +
+    "          <button ng-click=\"showCodeDetails(code)\" class=\"raml-console-resource-btn raml-console-resource-menu-button raml-console-resource-menu-btn-{{getColorCode(code)}}\" ng-class=\"{ 'raml-console-button-is-active': isActiveCode(code) }\" href=\"#code{{code}}\">{{code}}</button>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <div class=\"raml-console-resource-panel-primary-row raml-console-resource-panel-content raml-console-is-active raml-console-response-container\" ng-class=\"{'raml-console-is-active':showResponseDocumentation}\">\n" +
+    "      <section ng-if=\"isActiveCode(code)\" class=\"raml-console-resource-section raml-console-resource-response-section\" ng-repeat=\"code in methodInfo.responseCodes\">\n" +
+    "        <a name=\"code{{code}}\"></a>\n" +
+    "        <h3 class=\"raml-console-resource-heading-a\">Status {{code}}</h3>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-response\">\n" +
+    "          <p markdown=\"methodInfo.responses[code].description\" class=\"raml-console-marked-content\"></p>\n" +
+    "        </div>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-response\" ng-if=\"methodInfo.responses[code].headers\">\n" +
+    "          <h4 class=\"raml-console-resource-body-heading\">Headers</h4>\n" +
+    "\n" +
+    "          <div class=\"raml-console-resource-param\" ng-repeat=\"header in methodInfo.responses[code].headers\">\n" +
+    "            <h4 class=\"raml-console-resource-param-heading\">{{header[0].displayName}} <span class=\"raml-console-resource-param-instructional\">{{header[0].type}}</span></h4>\n" +
+    "\n" +
+    "            <p markdown=\"header[0].description\" class=\"raml-console-marked-content\"></p>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "\n" +
+    "        <div class=\"raml-console-resource-response\" ng-if=\"methodInfo.responses[code].body\">\n" +
+    "          <h4 class=\"raml-console-resource-body-heading\">\n" +
+    "            Body\n" +
+    "            <span ng-click=\"changeType($event, key, code)\" ng-class=\"{ 'raml-console-is-active': $first}\" class=\"raml-console-flag\" ng-repeat=\"(key, value) in methodInfo.responses[code].body\">{{key}}</span>\n" +
+    "          </h4>\n" +
+    "\n" +
+    "          <div ng-if=\"responseInfo[code][responseInfo[code].currentType].example\">\n" +
+    "            <span>Example:</span>\n" +
+    "            <div  class=\"raml-console-resource-pre\" ui-codemirror=\"{\n" +
+    "                lineNumbers: true,\n" +
+    "                tabSize: 2,\n" +
+    "                mode: responseInfo[code].currentType,\n" +
+    "                gutters: ['CodeMirror-lint-markers'],\n" +
+    "                theme : 'raml-console'\n" +
+    "              }\" ng-model=\"responseInfo[code][responseInfo[code].currentType].example\">\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "\n" +
+    "          <div class=\"raml-console-schema-container\" ng-if=\"responseInfo[code][responseInfo[code].currentType].schema\">\n" +
+    "            <p><button ng-click=\"showSchema($event)\" class=\"raml-console-resource-btn\">Show Schema</button></p>\n" +
+    "            <div  class=\"raml-console-resource-pre raml-console-resource-pre-toggle\" ui-codemirror=\"{\n" +
+    "              lineNumbers: true,\n" +
+    "              tabSize: 2,\n" +
+    "              mode: responseInfo[code].currentType,\n" +
+    "              gutters: ['CodeMirror-lint-markers'],\n" +
+    "              theme : 'raml-console'\n" +
+    "            }\" ng-model=\"responseInfo[code][responseInfo[code].currentType].schema\">\n" +
+    "\n" +
+    "            </div>\n" +
+    "        </div>\n" +
+    "      </section>\n" +
+    "\n" +
+    "\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</div>\n" +
     "\n" +
-    "\r" +
-    "\n" +
-    "    <p markdown=\"methodInfo.description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <section class=\"raml-console-resource-section\" id=\"docs-uri-parameters\" ng-if=\"resource.uriParametersForDocumentation\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-heading-a\">URI Parameters</h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <div class=\"raml-console-resource-param\" id=\"docs-uri-parameters-{{uriParam[0].displayName}}\" ng-repeat=\"uriParam in resource.uriParametersForDocumentation\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-param-heading\">{{uriParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(uriParam[0])}}</span></h4>\r" +
-    "\n" +
-    "        <p markdown=\"uriParam[0].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <p ng-if=\"uriParam[0].example !== undefined\">\r" +
-    "\n" +
-    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{uriParam[0].example}}</span>\r" +
-    "\n" +
-    "        </p>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "    </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <section class=\"raml-console-resource-section\" id=\"docs-headers\" ng-if=\"methodInfo.headers.plain\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-heading-a\">Headers</h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <div class=\"raml-console-resource-param\" ng-repeat=\"header in methodInfo.headers.plain\" ng-if=\"!header[0].isFromSecurityScheme\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-param-heading\">{{header[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(header[0])}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <p markdown=\"header[0].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <p ng-if=\"header[0].example !== undefined\">\r" +
-    "\n" +
-    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{header[0].example}}</span>\r" +
-    "\n" +
-    "        </p>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "    </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <section class=\"raml-console-resource-section\" id=\"docs-query-parameters\" ng-if=\"methodInfo.queryParameters\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-heading-a\">Query Parameters</h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <div class=\"raml-console-resource-param\" ng-repeat=\"queryParam in methodInfo.queryParameters\" ng-if=\"!queryParam[0].isFromSecurityScheme\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-param-heading\">{{queryParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(queryParam[0])}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <p markdown=\"queryParam[0].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <p ng-if=\"queryParam[0].example !== undefined\">\r" +
-    "\n" +
-    "          <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{queryParam[0].example}}</span>\r" +
-    "\n" +
-    "        </p>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "    </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <section class=\"raml-console-resource-section raml-console-documentation-schemes\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-heading-a\">Security Schemes</h3>\r" +
-    "\n" +
-    "      <ol class=\"raml-console-documentation-security-scheme\">\r" +
-    "\n" +
-    "        <li class=\"raml-console-documentation-scheme\" ng-class=\"{'raml-console-is-active':isSchemeSelected(value)}\" ng-click=\"selectDocumentationScheme(value)\" ng-repeat=\"(key, value) in securitySchemes\">{{value.name}}</li>\r" +
-    "\n" +
-    "      </ol>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <p ng-if\"documentationSchemeSelected.description\" markdown=\"documentationSchemeSelected.description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <section class=\"raml-console-resource-section raml-console-scheme-headers\" ng-if=\"documentationSchemeSelected.describedBy.headers\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-heading-a\">Headers</h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, header) in documentationSchemeSelected.describedBy.headers\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(header)}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p markdown=\"header.description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p ng-if=\"header.example !== undefined\">\r" +
-    "\n" +
-    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{header.example}}</span>\r" +
-    "\n" +
-    "          </p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <section class=\"raml-console-resource-section raml-console-scheme-query-parameters\" ng-if=\"documentationSchemeSelected.describedBy.queryParameters\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-heading-a\">Query Parameters</h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, queryParameter) in documentationSchemeSelected.describedBy.queryParameters\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(queryParameter)}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p markdown=\"queryParameter.description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p ng-if=\"queryParameter.example !== undefined\">\r" +
-    "\n" +
-    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{queryParameter.example}}</span>\r" +
-    "\n" +
-    "          </p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <section class=\"raml-console-resource-section raml-console-scheme-responses\" ng-if=\"documentationSchemeSelected.describedBy.responses\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-heading-a\">Responses</h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(code, info) in documentationSchemeSelected.describedBy.responses\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-param-heading\">{{code}}</h4>\r" +
-    "\n" +
-    "          <p markdown=\"info.description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <section class=\"raml-console-resource-section raml-console-scheme-settings\" ng-if=\"documentationSchemeSelected.settings\">\r" +
-    "\n" +
-    "        <h4 class=\"raml-console-resource-heading-a\">Settings</h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-param\" ng-repeat=\"(key, config) in documentationSchemeSelected.settings\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-param-heading\">{{key}}</h4>\r" +
-    "\n" +
-    "          <p>{{schemaSettingsDocumentation(config)}}</p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "    </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <section class=\"raml-console-resource-section\" ng-if=\"methodInfo.body\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-heading-a\">\r" +
-    "\n" +
-    "        Body\r" +
-    "\n" +
-    "      </h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <h4 class=\"raml-console-request-body-heading\">\r" +
-    "\n" +
-    "        <span ng-click=\"changeResourceBodyType($event, key)\" ng-class=\"{ 'raml-console-is-active' : bodySelected(key)}\" class=\"raml-console-flag raml-console-body-{{getBodyId(key)}}\" ng-repeat=\"(key, value) in methodInfo.body\">{{key}}</span>\r" +
-    "\n" +
-    "      </h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <section ng-if=\"methodInfo.body[currentBodySelected].formParameters\">\r" +
-    "\n" +
-    "         <div class=\"raml-console-resource-param\" ng-repeat=\"formParam in methodInfo.body[currentBodySelected].formParameters\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-param-heading\">{{formParam[0].displayName}}<span class=\"raml-console-resource-param-instructional\">{{parameterDocumentation(formParam[0])}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p markdown=\"formParam[0].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <p ng-if=\"formParam[0].example !== undefined\">\r" +
-    "\n" +
-    "            <span class=\"raml-console-resource-param-example\"><b>Example:</b> {{formParam[0].example}}</span>\r" +
-    "\n" +
-    "          </p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <div ng-if=\"methodInfo.body[currentBodySelected].example\">\r" +
-    "\n" +
-    "        <span>Example:</span>\r" +
-    "\n" +
-    "        <pre class=\"raml-console-resource-pre\"><code class=\"raml-console-hljs\" hljs source=\"getBeatifiedExample(methodInfo.body[currentBodySelected].example)\"></code></pre>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "      <div class=\"raml-console-schema-container\" ng-if=\"methodInfo.body[currentBodySelected].schema\">\r" +
-    "\n" +
-    "        <p><button ng-click=\"showSchema($event)\" class=\"raml-console-resource-btn\">Show Schema</button></p>\r" +
-    "\n" +
-    "        <pre class=\"raml-console-resource-pre raml-console-resource-pre-toggle\"><code class=\"raml-console-hljs\" hljs source=\"getBeatifiedExample(methodInfo.body[currentBodySelected].schema)\"></code></pre>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "    </section>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "  <!-- Response -->\r" +
-    "\n" +
-    "  <div ng-if=\"methodInfo.responseCodes\">\r" +
-    "\n" +
-    "    <header class=\"raml-console-resource-header\">\r" +
-    "\n" +
-    "      <h3 class=\"raml-console-resource-head\">\r" +
-    "\n" +
-    "        Response\r" +
-    "\n" +
-    "      </h3>\r" +
-    "\n" +
-    "    </header>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <div class=\"raml-console-resource-response-jump\">\r" +
-    "\n" +
-    "      <ul class=\"raml-console-resource-menu\">\r" +
-    "\n" +
-    "        <li class=\"raml-console-resource-btns raml-console-resource-menu-item\" ng-repeat=\"code in methodInfo.responseCodes\">\r" +
-    "\n" +
-    "          <button ng-click=\"showCodeDetails(code)\" class=\"raml-console-resource-btn raml-console-resource-menu-button raml-console-resource-menu-btn-{{getColorCode(code)}}\" ng-class=\"{ 'raml-console-button-is-active': isActiveCode(code) }\" href=\"#code{{code}}\">{{code}}</button>\r" +
-    "\n" +
-    "        </li>\r" +
-    "\n" +
-    "      </ul>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <div class=\"raml-console-resource-panel-primary-row raml-console-resource-panel-content raml-console-is-active raml-console-response-container\" ng-class=\"{'raml-console-is-active':showResponseDocumentation}\">\r" +
-    "\n" +
-    "      <section ng-if=\"isActiveCode(code)\" class=\"raml-console-resource-section raml-console-resource-response-section\" ng-repeat=\"code in methodInfo.responseCodes\">\r" +
-    "\n" +
-    "        <a name=\"code{{code}}\"></a>\r" +
-    "\n" +
-    "        <h3 class=\"raml-console-resource-heading-a\">Status {{code}}</h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-response\">\r" +
-    "\n" +
-    "          <p markdown=\"methodInfo.responses[code].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-response\" ng-if=\"methodInfo.responses[code].headers\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-body-heading\">Headers</h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <div class=\"raml-console-resource-param\" ng-repeat=\"header in methodInfo.responses[code].headers\">\r" +
-    "\n" +
-    "            <h4 class=\"raml-console-resource-param-heading\">{{header[0].displayName}} <span class=\"raml-console-resource-param-instructional\">{{header[0].type}}</span></h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <p markdown=\"header[0].description\" class=\"raml-console-marked-content\"></p>\r" +
-    "\n" +
-    "          </div>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-resource-response\" ng-if=\"methodInfo.responses[code].body\">\r" +
-    "\n" +
-    "          <h4 class=\"raml-console-resource-body-heading\">\r" +
-    "\n" +
-    "            Body\r" +
-    "\n" +
-    "            <span ng-click=\"changeType($event, key, code)\" ng-class=\"{ 'raml-console-is-active': $first}\" class=\"raml-console-flag\" ng-repeat=\"(key, value) in methodInfo.responses[code].body\">{{key}}</span>\r" +
-    "\n" +
-    "          </h4>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <div ng-if=\"responseInfo[code][responseInfo[code].currentType].example\">\r" +
-    "\n" +
-    "            <span>Example:</span>\r" +
-    "\n" +
-    "            <pre class=\"raml-console-resource-pre\"><code class=\"raml-console-hljs\" hljs source=\"getBeatifiedExample(responseInfo[code][responseInfo[code].currentType].example)\"></code></pre>\r" +
-    "\n" +
-    "          </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <div class=\"raml-console-schema-container\" ng-if=\"responseInfo[code][responseInfo[code].currentType].schema\">\r" +
-    "\n" +
-    "            <p><button ng-click=\"showSchema($event)\" class=\"raml-console-resource-btn\">Show Schema</button></p>\r" +
-    "\n" +
-    "            <pre class=\"raml-console-resource-pre raml-console-resource-pre-toggle\"><code class=\"raml-console-hljs\" hljs source=\"getBeatifiedExample(responseInfo[code][responseInfo[code].currentType].schema)\"></code></pre>\r" +
-    "\n" +
-    "          </div>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "      </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "</div>\r" +
     "\n"
   );
 
@@ -6173,372 +6009,189 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
 
 
   $templateCache.put('directives/sidebar.tpl.html',
-    "  <form name=\"form\" class=\"raml-console-sidebar\" novalidate ng-class=\"{ 'raml-console-is-collapsed': singleView }\" ng-if=\"!disableTryIt\" ng-init=\"setFormScope(this)\">\r" +
-    "\n" +
-    "    <div class=\"raml-console-sidebar-flex-wrapper\">\r" +
-    "\n" +
-    "      <div class=\"raml-console-sidebar-content\">\r" +
-    "\n" +
-    "        <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\r" +
-    "\n" +
-    "          <h3 class=\"raml-console-sidebar-head\">\r" +
-    "\n" +
-    "            Try it\r" +
-    "\n" +
-    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-fullscreen-toggle\" ng-click=\"collapseSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\r" +
-    "\n" +
-    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"closeSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <a ng-if=\"singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"toggleSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-resize-toggle raml-console-sidebar-resize\" ng-click=\"toggleSidebar($event)\">\r" +
-    "\n" +
-    "              <svg x=\"0px\" y=\"0px\" viewBox=\"0 0 850 1000\" class=\"raml-console-full-resize\" fill=\"#808080\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"><path d=\"M421.29 589.312q0 7.254 -5.58 12.834l-185.256 185.256 80.352 80.352q10.602 10.602 10.602 25.11t-10.602 25.11 -25.11 10.602h-249.984q-14.508 0 -25.11 -10.602t-10.602 -25.11v-249.984q0 -14.508 10.602 -25.11t25.11 -10.602 25.11 10.602l80.352 80.352 185.256 -185.256q5.58 -5.58 12.834 -5.58t12.834 5.58l63.612 63.612q5.58 5.58 5.58 12.834zm435.798 -482.112v249.984q0 14.508 -10.602 25.11t-25.11 10.602 -25.11 -10.602l-80.352 -80.352 -185.256 185.256q-5.58 5.58 -12.834 5.58t-12.834 -5.58l-63.612 -63.612q-5.58 -5.58 -5.58 -12.834t5.58 -12.834l185.256 -185.256 -80.352 -80.352q-10.602 -10.602 -10.602 -25.11t10.602 -25.11 25.11 -10.602h249.984q14.508 0 25.11 10.602t10.602 25.11z\"/></svg>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "              <svg x=\"0px\" y=\"0px\" viewBox=\"0 0 850 1000\" class=\"raml-console-small-resize\" fill=\"#808080\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"><path d=\"M428.544 535.744v249.984q0 14.508 -10.602 25.11t-25.11 10.602 -25.11 -10.602l-80.352 -80.352 -185.256 185.256q-5.58 5.58 -12.834 5.58t-12.834 -5.58l-63.612 -63.612q-5.58 -5.58 -5.58 -12.834t5.58 -12.834l185.256 -185.256 -80.352 -80.352q-10.602 -10.602 -10.602 -25.11t10.602 -25.11 25.11 -10.602h249.984q14.508 0 25.11 10.602t10.602 25.11zm421.29 -374.976q0 7.254 -5.58 12.834l-185.256 185.256 80.352 80.352q10.602 10.602 10.602 25.11t-10.602 25.11 -25.11 10.602h-249.984q-14.508 0 -25.11 -10.602t-10.602 -25.11v-249.984q0 -14.508 10.602 -25.11t25.11 -10.602 25.11 10.602l80.352 80.352 185.256 -185.256q5.58 -5.58 12.834 -5.58t12.834 5.58l63.612 63.612q5.58 5.58 5.58 12.834z\"/></svg>\r" +
-    "\n" +
-    "            </a>\r" +
-    "\n" +
-    "          </h3>\r" +
-    "\n" +
-    "        </header>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <div class=\"raml-console-sidebar-content-wrapper\">\r" +
-    "\n" +
-    "          <section ng-if=\"raml.protocols.length > 1\">\r" +
-    "\n" +
-    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader raml-console-sidebar-subheader-top\">\r" +
-    "\n" +
-    "              <h4 class=\"raml-console-sidebar-subhead\">Protocols</h4>\r" +
-    "\n" +
-    "            </header>\r" +
-    "\n" +
-    "            <div class=\"raml-console-sidebar-row raml-console-sidebar-securty\">\r" +
-    "\n" +
-    "              <select ng-change=\"protocolChanged(currentProtocol)\" class=\"raml-console-sidebar-input\" ng-model=\"currentProtocol\" style=\"margin-bottom: 0;\">\r" +
-    "\n" +
-    "               <option ng-repeat=\"protocol in raml.protocols\" value=\"{{protocol}}\">{{protocol}}</option>\r" +
-    "\n" +
-    "              </select>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "          </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <section>\r" +
-    "\n" +
-    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader\" ng-class=\"{'raml-console-sidebar-subheader-top':raml.protocols.length == 1}\">\r" +
-    "\n" +
-    "              <h4 class=\"raml-console-sidebar-subhead\">Authentication</h4>\r" +
-    "\n" +
-    "            </header>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <div class=\"raml-console-sidebar-row raml-console-sidebar-securty\">\r" +
-    "\n" +
-    "              <div class=\"raml-console-toggle-group raml-console-sidebar-toggle-group\">\r" +
-    "\n" +
-    "                <label class=\"raml-console-sidebar-label\">Security Scheme</label>\r" +
-    "\n" +
-    "                <select ng-change=\"securitySchemeChanged(currentScheme)\" class=\"raml-console-sidebar-input\" ng-model=\"currentScheme\" style=\"margin-bottom: 0;\">\r" +
-    "\n" +
-    "                 <option ng-repeat=\"(key, scheme) in securitySchemes\" value=\"{{scheme.id}}\">{{scheme.name}}</option>\r" +
-    "\n" +
-    "                </select>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <div ng-switch=\"currentSchemeType\">\r" +
-    "\n" +
-    "              <basic-auth ng-switch-when=\"Basic Authentication\" credentials='credentials'></basic-auth>\r" +
-    "\n" +
-    "              <oauth1 ng-switch-when=\"OAuth 1.0\" credentials='credentials'></oauth1>\r" +
-    "\n" +
-    "              <oauth2 ng-switch-when=\"OAuth 2.0\" credentials='credentials'></oauth2>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "          </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <named-parameters ng-if=\"resource.uriParametersForDocumentation\" src=\"resource.uriParametersForDocumentation\" context=\"context\" type=\"uriParameters\" title=\"URI Parameters\" show-base-url></named-parameters>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <named-parameters src=\"methodInfo.headers.plain\" context=\"context\" type=\"headers\" title=\"Headers\" enable-custom-parameters></named-parameters>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <named-parameters src=\"methodInfo.queryParameters\" context=\"context\" type=\"queryParameters\" title=\"Query Parameters\" enable-custom-parameters></named-parameters>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <section id=\"sidebar-body\" ng-if=\"methodInfo.body\">\r" +
-    "\n" +
-    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader\">\r" +
-    "\n" +
-    "              <h4 class=\"raml-console-sidebar-subhead\">Body</h4>\r" +
-    "\n" +
-    "            </header>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <div class=\"raml-console-sidebar-row\" style=\"padding-bottom: 0;\">\r" +
-    "\n" +
-    "              <select ng-change=\"requestBodySelectionChange(context.bodyContent.selected)\" class=\"raml-console-sidebar-input\" ng-model=\"context.bodyContent.selected\" style=\"margin-bottom: 0;\">\r" +
-    "\n" +
-    "               <option ng-repeat=\"(key, scheme) in methodInfo.body\" value=\"{{key}}\">{{key}}</option>\r" +
-    "\n" +
-    "              </select>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <div class=\"raml-console-sidebar-row\" ng-switch=\"context.bodyContent.isForm(context.bodyContent.selected)\">\r" +
-    "\n" +
-    "              <div ng-switch-when=\"false\">\r" +
-    "\n" +
-    "                <div class=\"raml-console-codemirror-body-editor\" ui-codemirror=\"{ lineNumbers: true, tabSize: 2, theme : 'raml-console', mode: context.bodyContent.selected }\" ng-model=\"context.bodyContent.definitions[context.bodyContent.selected].value\"></div>\r" +
-    "\n" +
-    "                <div class=\"raml-console-sidebar-prefill raml-console-sidebar-row\" align=\"right\" ng-if=\"context.bodyContent.definitions[context.bodyContent.selected].hasExample()\">\r" +
-    "\n" +
-    "                  <button class=\"raml-console-sidebar-action-prefill\" ng-click=\"prefillBody(context.bodyContent.selected)\">Prefill with example</button>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "              <div ng-switch-when=\"true\">\r" +
-    "\n" +
-    "                <p class=\"raml-console-sidebar-input-container\" ng-repeat=\"param in context.bodyContent.definitions[context.bodyContent.selected].plain\">\r" +
-    "\n" +
-    "                  <span class=\"raml-console-sidebar-input-tooltip-container\" ng-if=\"param.definitions[0].description\">\r" +
-    "\n" +
-    "                    <button tabindex=\"-1\" class=\"raml-console-sidebar-input-tooltip\"><span class=\"raml-console-visuallyhidden\">Show documentation</span></button>\r" +
-    "\n" +
-    "                    <span class=\"raml-console-sidebar-tooltip-flyout\">\r" +
-    "\n" +
-    "                      <span markdown=\"param.definitions[0].description\" class=\"raml-console-marked-content\"></span>\r" +
-    "\n" +
-    "                    </span>\r" +
-    "\n" +
-    "                  </span>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                  <raml-field param=\"param.definitions[0]\" model=\"context.bodyContent.definitions[context.bodyContent.selected].values[param.definitions[0].id]\"></raml-field>\r" +
-    "\n" +
-    "                </p>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "          </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <section>\r" +
-    "\n" +
-    "            <div class=\"raml-console-sidebar-row\">\r" +
-    "\n" +
-    "              <div class=\"raml-console-sidebar-action-group\">\r" +
-    "\n" +
-    "                <button ng-hide=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}\" ng-click=\"tryIt($event)\" ng-class=\"{'raml-console-sidebar-action-force':context.forceRequest}\"><span ng-if=\"context.forceRequest\">Force</span> {{methodInfo.method.toUpperCase()}}\r" +
-    "\n" +
-    "                </button>\r" +
-    "\n" +
-    "                <button ng-if=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}} raml-console-sidebar-action-cancel-request\" ng-click=\"cancelRequest()\">Cancel <div class=\"raml-console-spinner-request\" ng-if=\"showSpinner\">Loading ...</div></button>\r" +
-    "\n" +
-    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-clear\" ng-click=\"clearFields()\">Clear</button>\r" +
-    "\n" +
-    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-reset\" ng-click=\"resetFields()\">Reset</button>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "          </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "          <div ng-if=\"responseDetails\">\r" +
-    "\n" +
-    "            <section id=\"request_{{generateId(resource.pathSegments)}}\" class=\"raml-console-side-bar-try-it-description\">\r" +
-    "\n" +
-    "              <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\r" +
-    "\n" +
-    "                <h3 class=\"raml-console-sidebar-head raml-console-sidebar-head-expand\">\r" +
-    "\n" +
-    "                  <button ng-class=\"{'raml-console-is-open':showRequestMetadata, 'raml-console-is-collapsed':!showRequestMetadata}\" class=\"raml-console-sidebar-expand-btn\" ng-click=\"toggleRequestMetadata()\">\r" +
-    "\n" +
-    "                    Request\r" +
-    "\n" +
-    "                  </button>\r" +
-    "\n" +
-    "                </h3>\r" +
-    "\n" +
-    "              </header>\r" +
-    "\n" +
-    "              <div class=\"raml-console-sidebar-request-metadata\" ng-class=\"{'raml-console-is-active':showRequestMetadata}\">\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                <div class=\"raml-console-sidebar-row\">\r" +
-    "\n" +
-    "                  <div ng-if=\"requestOptions.url\">\r" +
-    "\n" +
-    "                    <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Request URL</h3>\r" +
-    "\n" +
-    "                    <div class=\"raml-console-sidebar-response-item\">\r" +
-    "\n" +
-    "                      <p class=\"raml-console-sidebar-response-metadata raml-console-sidebar-request-url\">{{requestOptions.url}}</p>\r" +
-    "\n" +
-    "                    </div>\r" +
-    "\n" +
-    "                  </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                  <div ng-if=\"requestOptions.headers\">\r" +
-    "\n" +
-    "                    <h3 class=\"raml-console-sidebar-response-head\">Headers</h3>\r" +
-    "\n" +
-    "                    <div class=\"raml-console-sidebar-response-item\">\r" +
-    "\n" +
-    "                      <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in requestOptions.headers\">\r" +
-    "\n" +
-    "                        <b>{{key}}:</b> <br>{{getHeaderValue(value)}}\r" +
-    "\n" +
-    "                      </p>\r" +
-    "\n" +
-    "                    </div>\r" +
-    "\n" +
-    "                  </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                  <div ng-if=\"requestOptions.data\">\r" +
-    "\n" +
-    "                    <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Body</h3>\r" +
-    "\n" +
-    "                    <div ng-switch=\"context.bodyContent.isForm(context.bodyContent.selected)\">\r" +
-    "\n" +
-    "                      <div ng-switch-when=\"false\" class=\"raml-console-sidebar-pre raml-console-sidebar-request-body\">\r" +
-    "\n" +
-    "                        <div ui-codemirror=\"{ readOnly: 'nocursor', tabSize: 2, lineNumbers: true, theme : 'raml-console', mode: context.bodyContent.selected }\" ng-model=\"requestOptions.data\"></div>\r" +
-    "\n" +
-    "                      </div>\r" +
-    "\n" +
-    "                      <div ng-switch-when=\"true\" class=\"raml-console-sidebar-response-item\">\r" +
-    "\n" +
-    "                        <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in context.bodyContent.definitions[context.bodyContent.selected].values\">\r" +
-    "\n" +
-    "                          <b>{{key}}:</b> <br>{{value}}\r" +
-    "\n" +
-    "                        </p>\r" +
-    "\n" +
-    "                      </div>\r" +
-    "\n" +
-    "                    </div>\r" +
-    "\n" +
-    "                  </div>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </section>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <section class=\"raml-console-side-bar-try-it-description\">\r" +
-    "\n" +
-    "              <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\r" +
-    "\n" +
-    "                <h3 class=\"raml-console-sidebar-head\">\r" +
-    "\n" +
-    "                  <button ng-class=\"{'raml-console-is-open':showResponseMetadata, 'raml-console-is-collapsed':!showResponseMetadata}\" class=\"raml-console-sidebar-expand-btn\" ng-click=\"toggleResponseMetadata()\">\r" +
-    "\n" +
-    "                    Response\r" +
-    "\n" +
-    "                  </button>\r" +
-    "\n" +
-    "                </h3>\r" +
-    "\n" +
-    "              </header>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "              <div class=\"raml-console-sidebar-row raml-console-sidebar-response\" ng-class=\"{'raml-console-is-active':showResponseMetadata}\">\r" +
-    "\n" +
-    "                <h3 class=\"raml-console-sidebar-response-head\">Status</h3>\r" +
-    "\n" +
-    "                <p class=\"raml-console-sidebar-response-item\">{{response.status}}</p>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                <h3 class=\"raml-console-sidebar-response-head\" ng-if=\"response.headers\">Headers</h3>\r" +
-    "\n" +
-    "                <div class=\"raml-console-sidebar-response-item\">\r" +
-    "\n" +
-    "                  <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in response.headers\">\r" +
-    "\n" +
-    "                    <b>{{key}}:</b> <br>{{value}}\r" +
-    "\n" +
-    "                  </p>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "                <div ng-if=\"response.body\">\r" +
-    "\n" +
-    "                  <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Body</h3>\r" +
-    "\n" +
-    "                  <div class=\"raml-console-sidebar-pre\">\r" +
-    "\n" +
-    "                    <div ui-codemirror=\"{ readOnly: true, tabSize: 2, lineNumbers: true, theme : 'raml-console', mode: response.contentType }\" ng-model=\"response.body\" ng-style=\"editorStyle\">\r" +
-    "\n" +
-    "                    </div>\r" +
-    "\n" +
-    "                  </div>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </section>\r" +
-    "\n" +
-    "          </div>\r" +
-    "\n" +
-    "      </div>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "</form>\r" +
-    "\n"
+    "  <form name=\"form\" class=\"raml-console-sidebar\" novalidate ng-class=\"{ 'raml-console-is-collapsed': singleView }\" ng-if=\"!disableTryIt\" ng-init=\"setFormScope(this)\">\n" +
+    "    <div class=\"raml-console-sidebar-flex-wrapper\">\n" +
+    "      <div class=\"raml-console-sidebar-content\">\n" +
+    "        <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
+    "          <h3 class=\"raml-console-sidebar-head\">\n" +
+    "            Try it\n" +
+    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-fullscreen-toggle\" ng-click=\"collapseSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
+    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"closeSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
+    "\n" +
+    "            <a ng-if=\"singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"toggleSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
+    "\n" +
+    "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-resize-toggle raml-console-sidebar-resize\" ng-click=\"toggleSidebar($event)\">\n" +
+    "              <svg x=\"0px\" y=\"0px\" viewBox=\"0 0 850 1000\" class=\"raml-console-full-resize\" fill=\"#808080\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"><path d=\"M421.29 589.312q0 7.254 -5.58 12.834l-185.256 185.256 80.352 80.352q10.602 10.602 10.602 25.11t-10.602 25.11 -25.11 10.602h-249.984q-14.508 0 -25.11 -10.602t-10.602 -25.11v-249.984q0 -14.508 10.602 -25.11t25.11 -10.602 25.11 10.602l80.352 80.352 185.256 -185.256q5.58 -5.58 12.834 -5.58t12.834 5.58l63.612 63.612q5.58 5.58 5.58 12.834zm435.798 -482.112v249.984q0 14.508 -10.602 25.11t-25.11 10.602 -25.11 -10.602l-80.352 -80.352 -185.256 185.256q-5.58 5.58 -12.834 5.58t-12.834 -5.58l-63.612 -63.612q-5.58 -5.58 -5.58 -12.834t5.58 -12.834l185.256 -185.256 -80.352 -80.352q-10.602 -10.602 -10.602 -25.11t10.602 -25.11 25.11 -10.602h249.984q14.508 0 25.11 10.602t10.602 25.11z\"/></svg>\n" +
+    "\n" +
+    "              <svg x=\"0px\" y=\"0px\" viewBox=\"0 0 850 1000\" class=\"raml-console-small-resize\" fill=\"#808080\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"><path d=\"M428.544 535.744v249.984q0 14.508 -10.602 25.11t-25.11 10.602 -25.11 -10.602l-80.352 -80.352 -185.256 185.256q-5.58 5.58 -12.834 5.58t-12.834 -5.58l-63.612 -63.612q-5.58 -5.58 -5.58 -12.834t5.58 -12.834l185.256 -185.256 -80.352 -80.352q-10.602 -10.602 -10.602 -25.11t10.602 -25.11 25.11 -10.602h249.984q14.508 0 25.11 10.602t10.602 25.11zm421.29 -374.976q0 7.254 -5.58 12.834l-185.256 185.256 80.352 80.352q10.602 10.602 10.602 25.11t-10.602 25.11 -25.11 10.602h-249.984q-14.508 0 -25.11 -10.602t-10.602 -25.11v-249.984q0 -14.508 10.602 -25.11t25.11 -10.602 25.11 10.602l80.352 80.352 185.256 -185.256q5.58 -5.58 12.834 -5.58t12.834 5.58l63.612 63.612q5.58 5.58 5.58 12.834z\"/></svg>\n" +
+    "            </a>\n" +
+    "          </h3>\n" +
+    "        </header>\n" +
+    "\n" +
+    "        <div class=\"raml-console-sidebar-content-wrapper\">\n" +
+    "          <section ng-if=\"raml.protocols.length > 1\">\n" +
+    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader raml-console-sidebar-subheader-top\">\n" +
+    "              <h4 class=\"raml-console-sidebar-subhead\">Protocols</h4>\n" +
+    "            </header>\n" +
+    "            <div class=\"raml-console-sidebar-row raml-console-sidebar-securty\">\n" +
+    "              <select ng-change=\"protocolChanged(currentProtocol)\" class=\"raml-console-sidebar-input\" ng-model=\"currentProtocol\" style=\"margin-bottom: 0;\">\n" +
+    "               <option ng-repeat=\"protocol in raml.protocols\" value=\"{{protocol}}\">{{protocol}}</option>\n" +
+    "              </select>\n" +
+    "            </div>\n" +
+    "          </section>\n" +
+    "\n" +
+    "          <section>\n" +
+    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader\" ng-class=\"{'raml-console-sidebar-subheader-top':raml.protocols.length == 1}\">\n" +
+    "              <h4 class=\"raml-console-sidebar-subhead\">Authentication</h4>\n" +
+    "            </header>\n" +
+    "\n" +
+    "            <div class=\"raml-console-sidebar-row raml-console-sidebar-securty\">\n" +
+    "              <div class=\"raml-console-toggle-group raml-console-sidebar-toggle-group\">\n" +
+    "                <label class=\"raml-console-sidebar-label\">Security Scheme</label>\n" +
+    "                <select ng-change=\"securitySchemeChanged(currentScheme)\" class=\"raml-console-sidebar-input\" ng-model=\"currentScheme\" style=\"margin-bottom: 0;\">\n" +
+    "                 <option ng-repeat=\"(key, scheme) in securitySchemes\" value=\"{{scheme.id}}\">{{scheme.name}}</option>\n" +
+    "                </select>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "\n" +
+    "            <div ng-switch=\"currentSchemeType\">\n" +
+    "              <basic-auth ng-switch-when=\"Basic Authentication\" credentials='credentials'></basic-auth>\n" +
+    "              <oauth1 ng-switch-when=\"OAuth 1.0\" credentials='credentials'></oauth1>\n" +
+    "              <oauth2 ng-switch-when=\"OAuth 2.0\" credentials='credentials'></oauth2>\n" +
+    "            </div>\n" +
+    "          </section>\n" +
+    "\n" +
+    "          <named-parameters ng-if=\"resource.uriParametersForDocumentation\" src=\"resource.uriParametersForDocumentation\" context=\"context\" type=\"uriParameters\" title=\"URI Parameters\" show-base-url></named-parameters>\n" +
+    "\n" +
+    "          <named-parameters src=\"methodInfo.headers.plain\" context=\"context\" type=\"headers\" title=\"Headers\" enable-custom-parameters></named-parameters>\n" +
+    "\n" +
+    "          <named-parameters src=\"methodInfo.queryParameters\" context=\"context\" type=\"queryParameters\" title=\"Query Parameters\" enable-custom-parameters></named-parameters>\n" +
+    "\n" +
+    "          <section id=\"sidebar-body\" ng-if=\"methodInfo.body\">\n" +
+    "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader\">\n" +
+    "              <h4 class=\"raml-console-sidebar-subhead\">Body</h4>\n" +
+    "            </header>\n" +
+    "\n" +
+    "            <div class=\"raml-console-sidebar-row\" style=\"padding-bottom: 0;\">\n" +
+    "              <select ng-change=\"requestBodySelectionChange(context.bodyContent.selected)\" class=\"raml-console-sidebar-input\" ng-model=\"context.bodyContent.selected\" style=\"margin-bottom: 0;\">\n" +
+    "               <option ng-repeat=\"(key, scheme) in methodInfo.body\" value=\"{{key}}\">{{key}}</option>\n" +
+    "              </select>\n" +
+    "            </div>\n" +
+    "\n" +
+    "            <div class=\"raml-console-sidebar-row\" ng-switch=\"context.bodyContent.isForm(context.bodyContent.selected)\">\n" +
+    "              <div ng-switch-when=\"false\">\n" +
+    "                <div class=\"raml-console-codemirror-body-editor\" ui-codemirror=\"{ lineNumbers: true, tabSize: 2, theme : 'raml-console', mode: context.bodyContent.selected }\" ng-model=\"context.bodyContent.definitions[context.bodyContent.selected].value\"></div>\n" +
+    "                <div class=\"raml-console-sidebar-prefill raml-console-sidebar-row\" align=\"right\" ng-if=\"context.bodyContent.definitions[context.bodyContent.selected].hasExample()\">\n" +
+    "                  <button class=\"raml-console-sidebar-action-prefill\" ng-click=\"prefillBody(context.bodyContent.selected)\">Prefill with example</button>\n" +
+    "                </div>\n" +
+    "              </div>\n" +
+    "\n" +
+    "\n" +
+    "              <div ng-switch-when=\"true\">\n" +
+    "                <p class=\"raml-console-sidebar-input-container\" ng-repeat=\"param in context.bodyContent.definitions[context.bodyContent.selected].plain\">\n" +
+    "                  <span class=\"raml-console-sidebar-input-tooltip-container\" ng-if=\"param.definitions[0].description\">\n" +
+    "                    <button tabindex=\"-1\" class=\"raml-console-sidebar-input-tooltip\"><span class=\"raml-console-visuallyhidden\">Show documentation</span></button>\n" +
+    "                    <span class=\"raml-console-sidebar-tooltip-flyout\">\n" +
+    "                      <span markdown=\"param.definitions[0].description\" class=\"raml-console-marked-content\"></span>\n" +
+    "                    </span>\n" +
+    "                  </span>\n" +
+    "\n" +
+    "                  <raml-field param=\"param.definitions[0]\" model=\"context.bodyContent.definitions[context.bodyContent.selected].values[param.definitions[0].id]\"></raml-field>\n" +
+    "                </p>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "          </section>\n" +
+    "\n" +
+    "          <section>\n" +
+    "            <div class=\"raml-console-sidebar-row\">\n" +
+    "              <div class=\"raml-console-sidebar-action-group\">\n" +
+    "                <button ng-hide=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}\" ng-click=\"tryIt($event)\" ng-class=\"{'raml-console-sidebar-action-force':context.forceRequest}\"><span ng-if=\"context.forceRequest\">Force</span> {{methodInfo.method.toUpperCase()}}\n" +
+    "                </button>\n" +
+    "                <button ng-if=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}} raml-console-sidebar-action-cancel-request\" ng-click=\"cancelRequest()\">Cancel <div class=\"raml-console-spinner-request\" ng-if=\"showSpinner\">Loading ...</div></button>\n" +
+    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-clear\" ng-click=\"clearFields()\">Clear</button>\n" +
+    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-reset\" ng-click=\"resetFields()\">Reset</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "          </section>\n" +
+    "\n" +
+    "          <div ng-if=\"responseDetails\">\n" +
+    "            <section id=\"request_{{generateId(resource.pathSegments)}}\" class=\"raml-console-side-bar-try-it-description\">\n" +
+    "              <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
+    "                <h3 class=\"raml-console-sidebar-head raml-console-sidebar-head-expand\">\n" +
+    "                  <button ng-class=\"{'raml-console-is-open':showRequestMetadata, 'raml-console-is-collapsed':!showRequestMetadata}\" class=\"raml-console-sidebar-expand-btn\" ng-click=\"toggleRequestMetadata()\">\n" +
+    "                    Request\n" +
+    "                  </button>\n" +
+    "                </h3>\n" +
+    "              </header>\n" +
+    "              <div class=\"raml-console-sidebar-request-metadata\" ng-class=\"{'raml-console-is-active':showRequestMetadata}\">\n" +
+    "\n" +
+    "                <div class=\"raml-console-sidebar-row\">\n" +
+    "                  <div ng-if=\"requestOptions.url\">\n" +
+    "                    <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Request URL</h3>\n" +
+    "                    <div class=\"raml-console-sidebar-response-item\">\n" +
+    "                      <p class=\"raml-console-sidebar-response-metadata raml-console-sidebar-request-url\">{{requestOptions.url}}</p>\n" +
+    "                    </div>\n" +
+    "                  </div>\n" +
+    "\n" +
+    "                  <div ng-if=\"requestOptions.headers\">\n" +
+    "                    <h3 class=\"raml-console-sidebar-response-head\">Headers</h3>\n" +
+    "                    <div class=\"raml-console-sidebar-response-item\">\n" +
+    "                      <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in requestOptions.headers\">\n" +
+    "                        <b>{{key}}:</b> <br>{{getHeaderValue(value)}}\n" +
+    "                      </p>\n" +
+    "                    </div>\n" +
+    "                  </div>\n" +
+    "\n" +
+    "                  <div ng-if=\"requestOptions.data\">\n" +
+    "                    <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Body</h3>\n" +
+    "                    <div ng-switch=\"context.bodyContent.isForm(context.bodyContent.selected)\">\n" +
+    "                      <div ng-switch-when=\"false\" class=\"raml-console-sidebar-pre raml-console-sidebar-request-body\">\n" +
+    "                        <div ui-codemirror=\"{ readOnly: 'nocursor', tabSize: 2, lineNumbers: true, theme : 'raml-console', mode: context.bodyContent.selected }\" ng-model=\"requestOptions.data\"></div>\n" +
+    "                      </div>\n" +
+    "                      <div ng-switch-when=\"true\" class=\"raml-console-sidebar-response-item\">\n" +
+    "                        <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in context.bodyContent.definitions[context.bodyContent.selected].values\">\n" +
+    "                          <b>{{key}}:</b> <br>{{value}}\n" +
+    "                        </p>\n" +
+    "                      </div>\n" +
+    "                    </div>\n" +
+    "                  </div>\n" +
+    "                </div>\n" +
+    "              </div>\n" +
+    "            </section>\n" +
+    "\n" +
+    "            <section class=\"raml-console-side-bar-try-it-description\">\n" +
+    "              <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
+    "                <h3 class=\"raml-console-sidebar-head\">\n" +
+    "                  <button ng-class=\"{'raml-console-is-open':showResponseMetadata, 'raml-console-is-collapsed':!showResponseMetadata}\" class=\"raml-console-sidebar-expand-btn\" ng-click=\"toggleResponseMetadata()\">\n" +
+    "                    Response\n" +
+    "                  </button>\n" +
+    "                </h3>\n" +
+    "              </header>\n" +
+    "\n" +
+    "              <div class=\"raml-console-sidebar-row raml-console-sidebar-response\" ng-class=\"{'raml-console-is-active':showResponseMetadata}\">\n" +
+    "                <h3 class=\"raml-console-sidebar-response-head\">Status</h3>\n" +
+    "                <p class=\"raml-console-sidebar-response-item\">{{response.status}}</p>\n" +
+    "\n" +
+    "                <h3 class=\"raml-console-sidebar-response-head\" ng-if=\"response.headers\">Headers</h3>\n" +
+    "                <div class=\"raml-console-sidebar-response-item\">\n" +
+    "                  <p class=\"raml-console-sidebar-response-metadata\" ng-repeat=\"(key, value) in response.headers\">\n" +
+    "                    <b>{{key}}:</b> <br>{{value}}\n" +
+    "                  </p>\n" +
+    "                </div>\n" +
+    "                <div ng-if=\"response.body\">\n" +
+    "                  <h3 class=\"raml-console-sidebar-response-head raml-console-sidebar-response-head-pre\">Body</h3>\n" +
+    "                  <div class=\"raml-console-sidebar-pre\">\n" +
+    "                    <div ui-codemirror=\"{ readOnly: true, tabSize: 2, lineNumbers: true, theme : 'raml-console', mode: response.contentType }\" ng-model=\"response.body\" ng-style=\"editorStyle\">\n" +
+    "                    </div>\n" +
+    "                  </div>\n" +
+    "                </div>\n" +
+    "              </div>\n" +
+    "            </section>\n" +
+    "          </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</form>\n"
   );
 
 
