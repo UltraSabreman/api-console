@@ -51,14 +51,71 @@
   margin-left: 0;
 }
 
+@mixin specailColors($primCol, $secCol) {
+  border-color: $primCol;
+  & .resource-header {
+    background-color: $primCol;
+    color: white;
+    margin-top: -1px;
+  }
+  & .sidebar-controls-collapse {
+    margin-right: 1px;
+    background-color: $secCol;
+    & * {
+      color: white;
+      fill: white;
+    }
+    & button {
+      background-color: $secCol;
+    }
+
+    &:hover {
+      background: darken($secCol, 5%);
+      & button {
+        background: darken($secCol, 5%);
+      }
+    }
+  }
+  & .sidebar-content {
+    margin-right: -1px;
+    border-left: 0;
+
+    & .sidebar-header {
+      background-color: $secCol;
+      color: white;
+      margin-top: -1px;
+
+      & .sidebar-fullscreen-toggle {
+        border-color: white;
+        & * {
+          color: white;
+        }
+      }
+      & .sidebar-collapse-toggle {
+        border-color: white;
+        & * {
+          color: white;
+        }
+      }
+      & .sidebar-resize-toggle {
+        border-color: white;
+        & * {
+          color: white;
+          fill: white;
+        }
+      }
+    }
+  }
+}
+
 .resource-panel {
   position: relative;
 
   min-height: 500px;
 
   // display: none;
-  border: solid $color-resource-border;
-  border-width: 0 1px 1px;
+  border: 2px solid $color-resource-border;
+  //border-width: 0 1px 1px;
   border-radius: 0 0 5px 5px;
 
   background: $color-resource-bg;
@@ -66,9 +123,38 @@
   color: $color-resource-text;
 
   @media only screen and (min-width: $large-screen) {
-    border-width: 1px;
+    //border-width: 1px;
+  }
+
+  &.is-active-get {
+    @include specailColors($color-console-tab-get-active, $color-console-tab-get);
+  }
+  &.is-active-put {
+    @include specailColors($color-console-tab-put-active, $color-console-tab-put);
+  }
+  &.is-active-post {
+    @include specailColors($color-console-tab-post-active, $color-console-tab-post);
+  }
+  &.is-active-delete {
+    @include specailColors($color-console-tab-delete-active, $color-console-tab-delete);
+  }
+  &.is-active-options {
+    @include specailColors($color-console-tab-options-active, $color-console-tab-options);
+  }
+  &.is-active-trace {
+    @include specailColors($color-console-tab-trace-active, $color-console-tab-trace);
+  }
+  &.is-active-connect {
+    @include specailColors($color-console-tab-connect-active, $color-console-tab-connect);
+  }
+  &.is-active-head {
+    @include specailColors($color-console-tab-head-active, $color-console-tab-head);
+  }
+  &.is-active-patch {
+    @include specailColors($color-console-tab-patch-active, $color-console-tab-patch);
   }
 }
+
 
 .resource-panel-wrapper {
   padding: 0;

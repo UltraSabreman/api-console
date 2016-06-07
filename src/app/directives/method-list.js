@@ -161,10 +161,14 @@
 
             $rootScope.$broadcast('openMethod', $scope);
             jQuery($this).addClass('raml-console-is-active');
+
             $scope.showPanel = true;
 
             $timeout(function () {
               $location.hash(hash);
+
+              var panel = jQuery('.raml-console-resource-panel');
+              panel.addClass('raml-console-is-active-' + methodInfo.method.toLowerCase());
 
               // call $anchorScroll()
               $anchorScroll();
@@ -173,10 +177,20 @@
           } else if (jQuery($this).hasClass('raml-console-is-active')) {
             $scope.showPanel = false;
             $inactiveElements.removeClass('raml-console-is-active');
+
+            jQuery('.raml-console-resource-panel').removeClass('raml-console-is-active-' + methodInfo.method.toLowerCase());
+
             $scope.traits = null;
             $scope.methodInfo = {};
           } else {
             jQuery($this).addClass('raml-console-is-active');
+
+            var panel = jQuery('.raml-console-resource-panel');
+            jQuery('.raml-console-resource-panel').removeClass (function (index, css) {
+              return (css.match (/raml-console-is-active-(\S+)/g) || []).join(' ');
+            });
+            panel.addClass('raml-console-is-active-' + methodInfo.method.toLowerCase());
+
             jQuery($this).siblings('.raml-console-tab').removeClass('raml-console-is-active');
           }
         };

@@ -85,16 +85,13 @@
           $window.RAML.Settings.disableProxy = status;
         };
 
-        $scope.toggle = function ($event, index, collection, flagKey) {
+        $scope.toggle = function ($event, aRes) {
           var $this    = jQuery($event.currentTarget);
           var $section = $this
             .closest('.raml-console-resource-list-item')
-            .find('.raml-console-resource-list');
+            .children('.raml-console-resource-list');
 
-          collection[index] = !collection[index];
-
-          $scope[flagKey] = checkItemStatus(false, collection) ? false : $scope[flagKey];
-          $scope[flagKey] = checkItemStatus(true, collection) ? true : $scope[flagKey];
+          aRes.collapsed = !aRes.collapsed;
 
           $section.toggleClass('raml-console-is-collapsed');
         };
@@ -120,10 +117,6 @@
           for (var i = 0; i < collection.length; i++) {
             collection[i] = collection[i] !== null ? status : collection[i];
           }
-        }
-
-        function checkItemStatus(status, collection) {
-          return collection.filter(function (el) { return el === status || el === null; }).length === collection.length;
         }
 
         $scope.hasResourcesWithChilds = function () {
@@ -157,12 +150,6 @@
           }
         });
 
-        $scope.checkSearch = function(isLast) {
-            if (!isLast) { return; }
-            //here we set searchDone to true no matter what, since we dont want subsiquent raml changes
-            //to search.
-            //$location.url($location.path());
-        };
       }],
       link: function($scope) {
         ramlParserWrapper.onParseSuccess(function(raml) {

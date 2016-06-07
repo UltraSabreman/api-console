@@ -15,16 +15,16 @@ RAML.Inspector = (function() {
       overview.methods = overview.methods.map(function(method) {
         return RAML.Inspector.Method.create(method, securitySchemes);
       });
-
+      
+      if (resource.resources) {
+        var extracted = extractResources(resourcePathSegments, resource, securitySchemes);
+        overview.resources = extracted;
+      } else {
+        overview.resources = [];
+      }
 
       resources.push(overview);
 
-      if (resource.resources) {
-        var extracted = extractResources(resourcePathSegments, resource, securitySchemes);
-        extracted.forEach(function(resource) {
-          resources.push(resource);
-        });
-      }
     });
 
     return resources;
@@ -99,6 +99,7 @@ RAML.Inspector = (function() {
 
     api.resources = extractResources([], api, api.securitySchemes);
     api.resourceGroups = groupResources(api.resources);
+    api.depth = 0;
 
     return api;
   };

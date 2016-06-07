@@ -135,7 +135,7 @@ ol.resources-container {
 }
 
 .resource-list-item.is-active + .resource-list-item {
-  border-top: 1px solid $color-console-border;
+  //border-top: 1px solid $color-console-border;
 }
 
 /* Resource Items */
@@ -160,12 +160,14 @@ ol.resources-container {
     padding-left: 32px;
   }
 
+  //this is the active resource entry.
   &.is-active {
     min-height: 50px;
-    margin: 10px 0 0;
-    border-color: $color-resource-path-active-border;
+    //margin: 10px 0 0;
+    //border-color: $color-resource-path-active-border;
 
-    background: $color-resource-path-active-bg;
+    //background: $color-resource-path-active-bg;
+
 
     @media only screen and (min-width: $medium-screen) {
       border-radius: 5px 5px 0 0;
@@ -197,16 +199,16 @@ ol.resources-container {
 }
 
 .resource.is-active .resource-path-container {
-  padding-top: 11px;
+  //padding-top: 11px;
 }
 
 .resource-root.is-active .resource-path-container {
   @media only screen and (min-width: $medium-screen) {
-    padding-top: 11px;
+    //padding-top: 11px;
   }
 
   @media only screen and (min-width: $large-screen) {
-    padding-top: 11px;
+    //padding-top: 11px;
   }
 }
 
@@ -245,7 +247,7 @@ ol.resources-container {
 }
 
 .resource-list-root > .resource-list-item.is-active + .resource-list-item {
-  border-top: 0;
+  //border-top: 0;
 }
 
 .resource.is-active + .resource-list {
@@ -253,7 +255,7 @@ ol.resources-container {
 }
 
 .resource.is-active .resource-path-active {
-  color: $color-resource-path-active;
+  //color: $color-resource-path-active;
   // transition: 0.3s ease all;
 }
 
