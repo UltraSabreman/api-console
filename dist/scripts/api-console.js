@@ -3083,15 +3083,10 @@ RAML.Inspector = (function() {
       overview.methods = overview.methods.map(function(method) {
         return RAML.Inspector.Method.create(method, securitySchemes);
       });
-
-      //resources.push(overview);
-
+      
       if (resource.resources) {
         var extracted = extractResources(resourcePathSegments, resource, securitySchemes);
         overview.resources = extracted;
-        /*extracted.forEach(function(resource) {
-          resources.push(resource);
-        });*/
       } else {
         overview.resources = [];
       }
