@@ -3,7 +3,7 @@
       <div class="raml-console-sidebar-content">
         <header class="raml-console-sidebar-row raml-console-sidebar-header">
           <h3 class="raml-console-sidebar-head">
-            Try it
+            {{methodInfo.CanTry === false ? "Info" : "Try It"}}
             <a ng-if="!singleView" class="raml-console-sidebar-fullscreen-toggle" ng-click="collapseSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
             <a ng-if="!singleView" class="raml-console-sidebar-collapse-toggle" ng-click="closeSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
 
@@ -94,14 +94,34 @@
           <section>
             <div class="raml-console-sidebar-row">
               <div class="raml-console-sidebar-action-group">
-                <button ng-hide="showSpinner" type="submit" class="raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}" ng-click="tryIt($event)" ng-class="{'raml-console-sidebar-action-force':context.forceRequest}"><span ng-if="context.forceRequest">Force</span> {{methodInfo.method.toUpperCase()}}
+                <button ng-hide="showSpinner" type="submit" class="raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}" ng-click="submitButton($event);" ng-class="{'raml-console-sidebar-action-force':context.forceRequest}"><span ng-if="context.forceRequest">Force</span> {{methodInfo.method.toUpperCase()}}
                 </button>
                 <button ng-if="showSpinner" type="submit" class="raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}} raml-console-sidebar-action-cancel-request" ng-click="cancelRequest()">Cancel <div class="raml-console-spinner-request" ng-if="showSpinner">Loading ...</div></button>
                 <button class="raml-console-sidebar-action raml-console-sidebar-action-clear" ng-click="clearFields()">Clear</button>
                 <button class="raml-console-sidebar-action raml-console-sidebar-action-reset" ng-click="resetFields()">Reset</button>
               </div>
+              <div ng-if="methodInfo.CanTry === false" style="font-size: 16px">
+                <span style="color: red; font-weight: bolder">WARNING</span><span style="color: black; font-weight: normal">: This call *WILL* modify data on your server!</span>
+              </div>
             </div>
           </section>
+
+          <div ng-if="methodInfo.CanTry === false" ng-show="methodInfo.warn" class="raml-console-danger">
+            <div class="raml-console-box">
+              <h3>Warning:</h3>
+              <span class="raml-console-warn-desc">
+              The call you're about to try <b>WILL</b> modify data
+              on your servers! Click OK if you understand and are willing to continue.
+              </span>
+              <span style="font-size: 12px"> Note: Calls and responses for dangerous methods will
+              be loged.</span>
+              <div>
+                <input type="checkbox" ng-model="$root.DontShowMessage">Don't show this again.</input>
+                <button ng-click="tryIt(methodInfo.ev); methodInfo.warn = false;">OK</button>
+                <button ng-click="methodInfo.warn = false;">Cancel</button>
+              </div>
+            </div>
+          </div>
 
           <div ng-if="responseDetails">
             <section id="request_{{generateId(resource.pathSegments)}}" class="raml-console-side-bar-try-it-description">

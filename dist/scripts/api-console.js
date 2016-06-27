@@ -1065,7 +1065,7 @@
       restrict: 'E',
       templateUrl: 'directives/sidebar.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', function ($scope, $timeout) {
+      controller: ['$scope', '$timeout', '$rootScope', '$http', function ($scope, $timeout, $rootScope, $http) {
         var defaultSchemaKey = Object.keys($scope.securitySchemes).sort()[0];
         var defaultSchema    = $scope.securitySchemes[defaultSchemaKey];
         var defaultAccept    = 'application/json';
@@ -1139,6 +1139,16 @@
 
         function handleResponse(jqXhr, err) {
           $scope.response.status = jqXhr ? jqXhr.status : err ? (err.status ? err.status : err.message) : 0;
+
+          if (!$scope.methodInfo.CanTry) {
+            var obj = {
+              IS_REQUEST: false,
+              USER: $rootScope._currentUser,
+              RESPONCE: jqXhr,
+              ERROR: err
+            };
+            $http.put('/log', JSON.stringify(obj));
+          }
 
           if (jqXhr) {
             $scope.response.headers = parseHeaders(jqXhr.getAllResponseHeaders());
@@ -1427,6 +1437,19 @@
           $scope.form = form;
         };
 
+        if ($rootScope.DontShowMessage === undefined) {
+          $rootScope.DontShowMessage = false;
+        }
+
+        $scope.submitButton = function(ev) {
+          if (!$rootScope.DontShowMessage && !$scope.methodInfo.CanTry) {
+            $scope.methodInfo.warn = true;
+            $scope.methodInfo.ev = ev;
+          } else {
+            $scope.tryIt(ev);
+          }
+        };
+
         $scope.tryIt = function ($event) {
           $scope.requestOptions  = null;
           $scope.responseDetails = false;
@@ -1470,11 +1493,30 @@
 
             request.queryParams($scope.parameters);
             request.header('Accept', $scope.raml.mediaType || defaultAccept);
-            request.headers(getParameters(context, 'headers'));
+            var headers = getParameters(context, 'headers');
+            request.headers(headers);
 
             if (context.bodyContent) {
               request.header('Content-Type', context.bodyContent.selected);
               request.data(context.bodyContent.data());
+            }
+
+            if (!$scope.methodInfo.CanTry) {
+              var obj = {
+                IS_REQUEST: true,
+                USER: $rootScope._currentUser,
+                HTTPType: $scope.methodInfo.method,
+                URL: url,
+                PARAMS: $scope.parameters,
+                HEADERS: headers
+              };
+              obj.HEADERS.Accept = $scope.raml.mediaType || defaultAccept;
+              if (context.bodyContent) {
+                obj.DATA = context.bodyContent.data();
+                obj.HEADERS['Content-Type'] = context.bodyContent.selected;
+              }
+
+              $http.put('/log', JSON.stringify(obj));
             }
 
             var authStrategy;
@@ -1656,6 +1698,21 @@
         $scope.toggleResponseMetadata = function () {
           $scope.showResponseMetadata = !$scope.showResponseMetadata;
         };
+
+        $scope.checkIfTryAvalible = function() {
+          if ($scope.methodInfo !== undefined ) {
+            if ($scope.methodInfo.description !== undefined) {
+              var index = $scope.methodInfo.description.indexOf('[[NOTSAFE]]');
+              if (index !== -1) {
+                $scope.methodInfo.CanTry = false;
+                $scope.methodInfo.description = $scope.methodInfo.description.slice(0, index);
+              } else {
+                $scope.methodInfo.CanTry = true;
+              }
+            }
+          }
+        };
+        $scope.checkIfTryAvalible();
       }]
     };
   };
@@ -5833,72 +5890,39 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
 
 
   $templateCache.put('directives/resource-panel.tpl.html',
-    "<div class=\"raml-console-resource-panel\" ng-if=\"showPanel\" ng-class=\"{ 'raml-console-has-sidebar-collapsed': singleView }\">\r" +
+    "<div class=\"raml-console-resource-panel\" ng-if=\"showPanel\" ng-class=\"{ 'raml-console-has-sidebar-collapsed': singleView }\">\n" +
+    "  <div class=\"raml-console-resource-no-baseuri\" ng-hide=\"raml.baseUri\">\n" +
+    "    <strong>Try-it</strong> is disabled because <strong>baseUri</strong> is not present\n" +
+    "  </div>\n" +
+    "  <div class=\"raml-console-resource-panel-wrapper\">\n" +
+    "    <documentation></documentation>\n" +
     "\n" +
-    "  <div class=\"raml-console-resource-no-baseuri\" ng-hide=\"raml.baseUri\">\r" +
+    "    <sidebar ng-show=\"raml.baseUri\"></sidebar>\n" +
     "\n" +
-    "    <strong>Try-it</strong> is disabled because <strong>baseUri</strong> is not present\r" +
+    "    <div class=\"raml-console-sidebar-controls raml-console-sidebar-controls-collapse\" ng-click=\"collapseSidebar($event)\" style=\"right: -1px; position: absolute;\"ng-hide=\"!raml.baseUri\" ng-if=\"!disableTryIt\">\n" +
+    "      <button class=\"raml-console-collapse\" style=\"height: 21px; margin-top: 9px;\">\n" +
+    "        <svg style=\"transform: rotate(-180deg); display: inline;\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 612 792\" enable-background=\"new 0 0 612 792\" xml:space=\"preserve\">\n" +
+    "          <g id=\"Layer_3\">\n" +
+    "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\n" +
+    "          </g>\n" +
+    "        </svg>\n" +
+    "        <span class=\"raml-console-discoverable\">{{CanTry ? \"Try it\" : \"Info\"}}</span>\n" +
+    "      </button>\n" +
+    "    </div>\n" +
     "\n" +
-    "  </div>\r" +
+    "    <div class=\"raml-console-sidebar-controls raml-console-sidebar-controls-fullscreen\" ng-click=\"toggleSidebar($event)\" style=\"right: -1px; position: absolute;\">\n" +
+    "      <button class=\"raml-console-collapse\" style=\"height: 21px; margin-top: 9px;\">\n" +
     "\n" +
-    "  <div class=\"raml-console-resource-panel-wrapper\">\r" +
-    "\n" +
-    "    <documentation></documentation>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <sidebar ng-show=\"raml.baseUri\"></sidebar>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <div class=\"raml-console-sidebar-controls raml-console-sidebar-controls-collapse\" ng-click=\"collapseSidebar($event)\" style=\"right: -1px; position: absolute;\"ng-hide=\"!raml.baseUri\" ng-if=\"!disableTryIt\">\r" +
-    "\n" +
-    "      <button class=\"raml-console-collapse\" style=\"height: 21px; margin-top: 9px;\">\r" +
-    "\n" +
-    "        <svg style=\"transform: rotate(-180deg); display: inline;\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 612 792\" enable-background=\"new 0 0 612 792\" xml:space=\"preserve\">\r" +
-    "\n" +
-    "          <g id=\"Layer_3\">\r" +
-    "\n" +
-    "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\r" +
-    "\n" +
-    "          </g>\r" +
-    "\n" +
-    "        </svg>\r" +
-    "\n" +
-    "        <span class=\"raml-console-discoverable\">Try it</span>\r" +
-    "\n" +
-    "      </button>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <div class=\"raml-console-sidebar-controls raml-console-sidebar-controls-fullscreen\" ng-click=\"toggleSidebar($event)\" style=\"right: -1px; position: absolute;\">\r" +
-    "\n" +
-    "      <button class=\"raml-console-collapse\" style=\"height: 21px; margin-top: 9px;\">\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <svg style=\"transform: rotate(-180deg); display: inline;\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 612 792\" enable-background=\"new 0 0 612 792\" xml:space=\"preserve\">\r" +
-    "\n" +
-    "          <g id=\"Layer_3\">\r" +
-    "\n" +
-    "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\r" +
-    "\n" +
-    "          </g>\r" +
-    "\n" +
-    "        </svg>\r" +
-    "\n" +
-    "        <span class=\"raml-console-discoverable\">Try it</span>\r" +
-    "\n" +
-    "      </button>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "</div>\r" +
-    "\n"
+    "        <svg style=\"transform: rotate(-180deg); display: inline;\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 612 792\" enable-background=\"new 0 0 612 792\" xml:space=\"preserve\">\n" +
+    "          <g id=\"Layer_3\">\n" +
+    "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\n" +
+    "          </g>\n" +
+    "        </svg>\n" +
+    "        <span class=\"raml-console-discoverable\">{{CanTry ? \"Try it\" : \"Info\"}}</span>\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</div>\n"
   );
 
 
@@ -6016,7 +6040,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "      <div class=\"raml-console-sidebar-content\">\n" +
     "        <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
     "          <h3 class=\"raml-console-sidebar-head\">\n" +
-    "            Try it\n" +
+    "            {{methodInfo.CanTry === false ? \"Info\" : \"Try It\"}}\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-fullscreen-toggle\" ng-click=\"collapseSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"closeSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "\n" +
@@ -6107,14 +6131,34 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "          <section>\n" +
     "            <div class=\"raml-console-sidebar-row\">\n" +
     "              <div class=\"raml-console-sidebar-action-group\">\n" +
-    "                <button ng-hide=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}\" ng-click=\"tryIt($event)\" ng-class=\"{'raml-console-sidebar-action-force':context.forceRequest}\"><span ng-if=\"context.forceRequest\">Force</span> {{methodInfo.method.toUpperCase()}}\n" +
+    "                <button ng-hide=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}}\" ng-click=\"submitButton($event);\" ng-class=\"{'raml-console-sidebar-action-force':context.forceRequest}\"><span ng-if=\"context.forceRequest\">Force</span> {{methodInfo.method.toUpperCase()}}\n" +
     "                </button>\n" +
     "                <button ng-if=\"showSpinner\" type=\"submit\" class=\"raml-console-sidebar-action raml-console-sidebar-action-{{methodInfo.method}} raml-console-sidebar-action-cancel-request\" ng-click=\"cancelRequest()\">Cancel <div class=\"raml-console-spinner-request\" ng-if=\"showSpinner\">Loading ...</div></button>\n" +
     "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-clear\" ng-click=\"clearFields()\">Clear</button>\n" +
     "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-reset\" ng-click=\"resetFields()\">Reset</button>\n" +
     "              </div>\n" +
+    "              <div ng-if=\"methodInfo.CanTry === false\" style=\"font-size: 16px\">\n" +
+    "                <span style=\"color: red; font-weight: bolder\">WARNING</span><span style=\"color: black; font-weight: normal\">: This call *WILL* modify data on your server!</span>\n" +
+    "              </div>\n" +
     "            </div>\n" +
     "          </section>\n" +
+    "\n" +
+    "          <div ng-if=\"methodInfo.CanTry === false\" ng-show=\"methodInfo.warn\" class=\"raml-console-danger\">\n" +
+    "            <div class=\"raml-console-box\">\n" +
+    "              <h3>Warning:</h3>\n" +
+    "              <span class=\"raml-console-warn-desc\">\n" +
+    "              The call you're about to try <b>WILL</b> modify data\n" +
+    "              on your servers! Click OK if you understand and are willing to continue.\n" +
+    "              </span>\n" +
+    "              <span style=\"font-size: 12px\"> Note: Calls and responses for dangerous methods will\n" +
+    "              be loged.</span>\n" +
+    "              <div>\n" +
+    "                <input type=\"checkbox\" ng-model=\"$root.DontShowMessage\">Don't show this again.</input>\n" +
+    "                <button ng-click=\"tryIt(methodInfo.ev); methodInfo.warn = false;\">OK</button>\n" +
+    "                <button ng-click=\"methodInfo.warn = false;\">Cancel</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
     "\n" +
     "          <div ng-if=\"responseDetails\">\n" +
     "            <section id=\"request_{{generateId(resource.pathSegments)}}\" class=\"raml-console-side-bar-try-it-description\">\n" +

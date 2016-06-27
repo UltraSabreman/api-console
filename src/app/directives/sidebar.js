@@ -6,7 +6,7 @@
       restrict: 'E',
       templateUrl: 'directives/sidebar.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', function ($scope, $timeout) {
+      controller: ['$scope', '$timeout', '$rootScope', '$http', function ($scope, $timeout, $rootScope, $http) {
         var defaultSchemaKey = Object.keys($scope.securitySchemes).sort()[0];
         var defaultSchema    = $scope.securitySchemes[defaultSchemaKey];
         var defaultAccept    = 'application/json';
@@ -80,6 +80,16 @@
 
         function handleResponse(jqXhr, err) {
           $scope.response.status = jqXhr ? jqXhr.status : err ? (err.status ? err.status : err.message) : 0;
+
+          if (!$scope.methodInfo.CanTry) {
+            var obj = {
+              IS_REQUEST: false,
+              USER: $rootScope._currentUser,
+              RESPONCE: jqXhr,
+              ERROR: err
+            };
+            $http.put('/log', JSON.stringify(obj));
+          }
 
           if (jqXhr) {
             $scope.response.headers = parseHeaders(jqXhr.getAllResponseHeaders());
@@ -368,6 +378,19 @@
           $scope.form = form;
         };
 
+        if ($rootScope.DontShowMessage === undefined) {
+          $rootScope.DontShowMessage = false;
+        }
+
+        $scope.submitButton = function(ev) {
+          if (!$rootScope.DontShowMessage && !$scope.methodInfo.CanTry) {
+            $scope.methodInfo.warn = true;
+            $scope.methodInfo.ev = ev;
+          } else {
+            $scope.tryIt(ev);
+          }
+        };
+
         $scope.tryIt = function ($event) {
           $scope.requestOptions  = null;
           $scope.responseDetails = false;
@@ -411,11 +434,30 @@
 
             request.queryParams($scope.parameters);
             request.header('Accept', $scope.raml.mediaType || defaultAccept);
-            request.headers(getParameters(context, 'headers'));
+            var headers = getParameters(context, 'headers');
+            request.headers(headers);
 
             if (context.bodyContent) {
               request.header('Content-Type', context.bodyContent.selected);
               request.data(context.bodyContent.data());
+            }
+
+            if (!$scope.methodInfo.CanTry) {
+              var obj = {
+                IS_REQUEST: true,
+                USER: $rootScope._currentUser,
+                HTTPType: $scope.methodInfo.method,
+                URL: url,
+                PARAMS: $scope.parameters,
+                HEADERS: headers
+              };
+              obj.HEADERS.Accept = $scope.raml.mediaType || defaultAccept;
+              if (context.bodyContent) {
+                obj.DATA = context.bodyContent.data();
+                obj.HEADERS['Content-Type'] = context.bodyContent.selected;
+              }
+
+              $http.put('/log', JSON.stringify(obj));
             }
 
             var authStrategy;
@@ -597,6 +639,21 @@
         $scope.toggleResponseMetadata = function () {
           $scope.showResponseMetadata = !$scope.showResponseMetadata;
         };
+
+        $scope.checkIfTryAvalible = function() {
+          if ($scope.methodInfo !== undefined ) {
+            if ($scope.methodInfo.description !== undefined) {
+              var index = $scope.methodInfo.description.indexOf('[[NOTSAFE]]');
+              if (index !== -1) {
+                $scope.methodInfo.CanTry = false;
+                $scope.methodInfo.description = $scope.methodInfo.description.slice(0, index);
+              } else {
+                $scope.methodInfo.CanTry = true;
+              }
+            }
+          }
+        };
+        $scope.checkIfTryAvalible();
       }]
     };
   };
