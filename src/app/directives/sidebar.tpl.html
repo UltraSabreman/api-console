@@ -3,7 +3,7 @@
       <div class="raml-console-sidebar-content">
         <header class="raml-console-sidebar-row raml-console-sidebar-header">
           <h3 class="raml-console-sidebar-head">
-            {{methodInfo.CanTry === false ? "Info" : "Try It"}}
+            "Try It"
             <a ng-if="!singleView" class="raml-console-sidebar-fullscreen-toggle" ng-click="collapseSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
             <a ng-if="!singleView" class="raml-console-sidebar-collapse-toggle" ng-click="closeSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
 
@@ -114,7 +114,7 @@
               on your servers! Click OK if you understand and are willing to continue.
               </span>
               <span style="font-size: 12px"> Note: Calls and responses for dangerous methods will
-              be loged.</span>
+              be logged.</span>
               <div>
                 <input type="checkbox" ng-model="$root.DontShowMessage">Don't show this again.</input>
                 <button ng-click="tryIt(methodInfo.ev); methodInfo.warn = false;">OK</button>

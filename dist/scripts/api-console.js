@@ -6040,7 +6040,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "      <div class=\"raml-console-sidebar-content\">\n" +
     "        <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
     "          <h3 class=\"raml-console-sidebar-head\">\n" +
-    "            {{methodInfo.CanTry === false ? \"Info\" : \"Try It\"}}\n" +
+    "            \"Try It\"\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-fullscreen-toggle\" ng-click=\"collapseSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"closeSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "\n" +
@@ -6151,7 +6151,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "              on your servers! Click OK if you understand and are willing to continue.\n" +
     "              </span>\n" +
     "              <span style=\"font-size: 12px\"> Note: Calls and responses for dangerous methods will\n" +
-    "              be loged.</span>\n" +
+    "              be logged.</span>\n" +
     "              <div>\n" +
     "                <input type=\"checkbox\" ng-model=\"$root.DontShowMessage\">Don't show this again.</input>\n" +
     "                <button ng-click=\"tryIt(methodInfo.ev); methodInfo.warn = false;\">OK</button>\n" +
