@@ -5202,11 +5202,11 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
       '-', '?', ':', ',', '[', ']', '{', '}',
       '#', '&', '*', '!', '|', '>', '\'', '"',
       '%', '@', '`'.
-    
+
     It may also start with
       '-', '?', ':'
     if it is followed by a non-space character.
-    
+
     Note that we limit the last rule to the block context (except the '-'
     character) because we want the flow context to be space independent.
     */
@@ -5225,7 +5225,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
     The byte order mark is stripped if it's the first character in the stream.
     We do not yet support BOM inside the stream as the specification requires.
     Any such mark will be considered as a part of the document.
-    
+
     TODO: We need to make tab handling rules more sane.  A good rule is
       Tabs cannot precede tokens BLOCK-SEQUENCE-START, BLOCK-MAPPING-START,
       BLOCK-END, KEY (block context), VALUE (block context), BLOCK-ENTRY
@@ -14410,15 +14410,15 @@ var objectHelper = (function () {
     function isString (value) {
         return Object.prototype.toString.apply(value) === '[object String]';
     }
-    
+
     function isNumber (value) {
         return Object.prototype.toString.apply(value) === '[object Number]';
     }
-    
+
     function isBoolean (value) {
         return Object.prototype.toString.apply(value) === '[object Boolean]';
     }
-    
+
     function join (arr, separator) {
         var
             result = '',
@@ -14876,7 +14876,7 @@ var parse = (function () {
                     }
                     continue;
                 }
-                if (rfcCharHelper.isVarchar(chr)) {
+                if (rfcCharHelper.isVarchar(chr) || chr === '=') {
                     continue;
                 }
                 closeVarname();
@@ -14921,6 +14921,9 @@ var parse = (function () {
                 varspecs.push(varspec);
                 varspec = null;
                 varnameStart = index + 1;
+                continue;
+            }
+            if (chr === '=') {
                 continue;
             }
             throw new UriTemplateError({expressionText: expressionText, message: "illegal character", character: chr, position: index});
@@ -15264,6 +15267,7 @@ var UriTemplate = (function () {
 },{}]},{},[10])
 (10)
 });
+
 (function(factory) {
 
   // Setup highlight.js for different environments. First is Node.js or

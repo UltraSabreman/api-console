@@ -51,13 +51,32 @@
   margin-left: 0;
 }
 
-@mixin specailColors($primCol, $secCol) {
+@mixin specialColors($primCol, $secCol) {
   border-color: $primCol;
   & .resource-header {
     background-color: $primCol;
     color: white;
     margin-top: -1px;
   }
+
+  & .sidebar-controls-fullscreen {
+    background-color: $secCol !important;
+    & * {
+      color: white !important;
+      fill: white !important;
+    }
+    & button {
+      background-color: $secCol !important;
+    }
+
+    &:hover {
+      background: darken($secCol, 5%) !important;
+      & button {
+        background: darken($secCol, 5%) !important;
+      }
+    }
+  }
+
   & .sidebar-controls-collapse {
     margin-right: 1px;
     background-color: $secCol !important;
@@ -127,31 +146,31 @@
   }
 
   &.is-active-get {
-    @include specailColors($color-console-tab-get-active, $color-console-tab-get);
+    @include specialColors($color-console-tab-get-active, $color-console-tab-get);
   }
   &.is-active-put {
-    @include specailColors($color-console-tab-put-active, $color-console-tab-put);
+    @include specialColors($color-console-tab-put-active, $color-console-tab-put);
   }
   &.is-active-post {
-    @include specailColors($color-console-tab-post-active, $color-console-tab-post);
+    @include specialColors($color-console-tab-post-active, $color-console-tab-post);
   }
   &.is-active-delete {
-    @include specailColors($color-console-tab-delete-active, $color-console-tab-delete);
+    @include specialColors($color-console-tab-delete-active, $color-console-tab-delete);
   }
   &.is-active-options {
-    @include specailColors($color-console-tab-options-active, $color-console-tab-options);
+    @include specialColors($color-console-tab-options-active, $color-console-tab-options);
   }
   &.is-active-trace {
-    @include specailColors($color-console-tab-trace-active, $color-console-tab-trace);
+    @include specialColors($color-console-tab-trace-active, $color-console-tab-trace);
   }
   &.is-active-connect {
-    @include specailColors($color-console-tab-connect-active, $color-console-tab-connect);
+    @include specialColors($color-console-tab-connect-active, $color-console-tab-connect);
   }
   &.is-active-head {
-    @include specailColors($color-console-tab-head-active, $color-console-tab-head);
+    @include specialColors($color-console-tab-head-active, $color-console-tab-head);
   }
   &.is-active-patch {
-    @include specailColors($color-console-tab-patch-active, $color-console-tab-patch);
+    @include specialColors($color-console-tab-patch-active, $color-console-tab-patch);
   }
 }
 

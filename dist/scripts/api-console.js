@@ -575,6 +575,8 @@
 
               // call $anchorScroll()
               $anchorScroll();
+
+              //$location.hash('');
             }, 10);
 
           } else if (jQuery($this).hasClass('raml-console-is-active')) {
@@ -600,7 +602,7 @@
 
         //This function is ran to get the only method tabs that are appropriate to our spesific method.
         $scope.init = function(last) {
-            if(!last) { return; }
+          if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
             $scope.checkIfExpanded();
@@ -616,14 +618,15 @@
           });
 
           newLocation.method = $scope.resource.toString();
-          newLocation.type = $scope.resource.methods[index].method.toLowerCase();
+          if (index !== -1) {
+            newLocation.type = $scope.resource.methods[index].method.toLowerCase();
+          }
           $location.path($location.path()).search(newLocation);
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
-        //TODO: if found, reset location so we dont look again.
         $scope.checkIfExpanded = function() {
-            var loc = $location.search();
+          var loc = $location.search();
             var target;
             if (loc.hasOwnProperty('method')) {
                 target = decodeURIComponent(loc.method);
@@ -634,17 +637,26 @@
             if (loc.hasOwnProperty('type')) {
                 type = loc.type;
             }
-            var foundIndex = -1;
 
-            for (var i = 0; i < $scope.resource.methods.length; i++) {
-              if ($scope.resource.methods[i].method.toLowerCase() === type.toLowerCase()) {
-                foundIndex = i;
-                break;
+            if ( $scope.resource.toString() === target) {
+              var foundIndex = -1;
+
+              for (var i = 0; i < $scope.resource.methods.length; i++) {
+                if ($scope.resource.methods[i].method.toLowerCase() === type.toLowerCase()) {
+                  foundIndex = i;
+                  break;
+                }
               }
-            }
 
-            if (foundIndex !== -1 && $scope.resource.toString() === target) {
-              $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
+
+              if (foundIndex !== -1) {
+                $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
+              } else {
+                var hash = $scope.generateId(target);
+                $location.hash(hash);
+                $anchorScroll();
+                //$location.hash('');
+              }
             }
         };
       }]
@@ -1065,7 +1077,7 @@
       restrict: 'E',
       templateUrl: 'directives/sidebar.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', '$rootScope', '$http', function ($scope, $timeout, $rootScope, $http) {
+      controller: ['$scope', '$timeout', '$rootScope', '$http', '$window', function ($scope, $timeout, $rootScope, $http, $window) {
         var defaultSchemaKey = Object.keys($scope.securitySchemes).sort()[0];
         var defaultSchema    = $scope.securitySchemes[defaultSchemaKey];
         var defaultAccept    = 'application/json';
@@ -1143,7 +1155,7 @@
           if (!$scope.methodInfo.CanTry) {
             var obj = {
               IS_REQUEST: false,
-              USER: $rootScope._currentUser,
+              USER: $window._currentUser,
               RESPONCE: jqXhr,
               ERROR: err
             };
@@ -1172,18 +1184,6 @@
           $scope.showMoreEnable  = true;
           $scope.showSpinner     = false;
           $scope.responseDetails = true;
-
-          // If the response fails because of CORS, responseText is null
-          var editorHeight = 50;
-
-          if (jqXhr && jqXhr.responseText) {
-            var lines = $scope.response.body.split('\n').length;
-            editorHeight = lines > 100 ? 2000 : 25*lines;
-          }
-
-          $scope.editorStyle = {
-            height: editorHeight + 'px'
-          };
 
           apply();
 
@@ -1504,7 +1504,7 @@
             if (!$scope.methodInfo.CanTry) {
               var obj = {
                 IS_REQUEST: true,
-                USER: $rootScope._currentUser,
+                USER: $window._currentUser,
                 HTTPType: $scope.methodInfo.method,
                 URL: url,
                 PARAMS: $scope.parameters,
@@ -1699,8 +1699,9 @@
           $scope.showResponseMetadata = !$scope.showResponseMetadata;
         };
 
+
         $scope.checkIfTryAvalible = function() {
-          if ($scope.methodInfo !== undefined ) {
+          if ($scope.methodInfo !== undefined && ($scope.methodInfo.CanTry || $scope.methodInfo.CanTry === undefined)) {
             if ($scope.methodInfo.description !== undefined) {
               var index = $scope.methodInfo.description.indexOf('[[NOTSAFE]]');
               if (index !== -1) {
@@ -1712,7 +1713,6 @@
             }
           }
         };
-        $scope.checkIfTryAvalible();
       }]
     };
   };
@@ -1902,7 +1902,7 @@
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', /*'$rootScope', '$location',*/ function($scope, $window, $attrs/*, $rootScope, $location*/) {
+      controller: ['$scope', '$window', '$attrs', '$anchorScroll', '$location', function($scope, $window, $attrs, $anchorScroll, $location) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -2016,6 +2016,23 @@
           return $scope.raml.resourceGroups.filter(function (el) {
             return el.length > 1;
           }).length > 0;
+        };
+
+        $scope.scrollToGroup = function(name) {
+          var ourName = name.toString().replace(/,/g,'');
+          var loc = $location.search();
+          var target;
+          if (loc.hasOwnProperty('method')) {
+            target = decodeURIComponent(loc.method);
+          } else {
+            return;
+          }
+          if (ourName === target) {
+            var hash = jQuery.trim(target.toString().replace(/\W/g, ' ')).replace(/\s+/g, '_');
+            $location.hash(hash);
+            $anchorScroll();
+            //$location.hash('_');
+          }
         };
 
         ramlParserWrapper.onParseError(function(error) {
@@ -5592,24 +5609,15 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
 
 
   $templateCache.put('directives/method-list.tpl.html',
-    "<div class=\"raml-console-tab-list\">\r" +
-    "\n" +
-    "  <!-- Here we call the init function in our controller after every tab is created, though it's actually only ever ran once, on the last tab\r" +
-    "\n" +
-    "       This ensures that all of the tabs are fully created.\r" +
-    "\n" +
-    "       This addition (and the addition/removal of the \"raml-console-init-tab\" class) is nesseary to make it possible for us\r" +
-    "\n" +
-    "       to expand the appropriate method.-->\r" +
-    "\n" +
-    "  <div class=\"raml-console-tab raml-console-init-tab\" ng-repeat=\"method in resource.methods\" ng-click=\"showResource($event, $index)\" >\r" +
-    "\n" +
-    "    <span class=\"raml-console-tab-label raml-console-tab-{{method.method}}\" ng-init=\"init($last)\">{{method.method.toLocaleUpperCase()}}</span>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "</div>\r" +
-    "\n"
+    "<div class=\"raml-console-tab-list\">\n" +
+    "  <!-- Here we call the init function in our controller after every tab is created, though it's actually only ever ran once, on the last tab\n" +
+    "       This ensures that all of the tabs are fully created.\n" +
+    "       This addition (and the addition/removal of the \"raml-console-init-tab\" class) is nesseary to make it possible for us\n" +
+    "       to expand the appropriate method.-->\n" +
+    "  <div class=\"raml-console-tab raml-console-init-tab\" ng-repeat=\"method in resource.methods\" ng-click=\"showResource($event, $index)\"  ng-init=\"init($last)\" >\n" +
+    "    <span class=\"raml-console-tab-label raml-console-tab-{{method.method}}\">{{method.method.toLocaleUpperCase()}}</span>\n" +
+    "  </div>\n" +
+    "</div>\n"
   );
 
 
@@ -5906,7 +5914,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\n" +
     "          </g>\n" +
     "        </svg>\n" +
-    "        <span class=\"raml-console-discoverable\">{{CanTry ? \"Try it\" : \"Info\"}}</span>\n" +
+    "        <span class=\"raml-console-discoverable\">Try it</span>\n" +
     "      </button>\n" +
     "    </div>\n" +
     "\n" +
@@ -5918,7 +5926,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "            <polygon fill=\"#585961\" points=\"480.9,396 142.1,46.2 142.1,745.8  \"/>\n" +
     "          </g>\n" +
     "        </svg>\n" +
-    "        <span class=\"raml-console-discoverable\">{{CanTry ? \"Try it\" : \"Info\"}}</span>\n" +
+    "        <span class=\"raml-console-discoverable\">Try it</span>\n" +
     "      </button>\n" +
     "    </div>\n" +
     "  </div>\n" +
@@ -6040,7 +6048,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "      <div class=\"raml-console-sidebar-content\">\n" +
     "        <header class=\"raml-console-sidebar-row raml-console-sidebar-header\">\n" +
     "          <h3 class=\"raml-console-sidebar-head\">\n" +
-    "            \"Try It\"\n" +
+    "            Try It\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-fullscreen-toggle\" ng-click=\"collapseSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "            <a ng-if=\"!singleView\" class=\"raml-console-sidebar-collapse-toggle\" ng-click=\"closeSidebar($event)\"><div class=\"raml-console-close-sidebar\">&times;</div></a>\n" +
     "\n" +
@@ -6053,7 +6061,6 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "            </a>\n" +
     "          </h3>\n" +
     "        </header>\n" +
-    "\n" +
     "        <div class=\"raml-console-sidebar-content-wrapper\">\n" +
     "          <section ng-if=\"raml.protocols.length > 1\">\n" +
     "            <header class=\"raml-console-sidebar-row raml-console-sidebar-subheader raml-console-sidebar-subheader-top\">\n" +
@@ -6149,13 +6156,15 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "              <span class=\"raml-console-warn-desc\">\n" +
     "              The call you're about to try <b>WILL</b> modify data\n" +
     "              on your servers! Click OK if you understand and are willing to continue.\n" +
+    "              <br>\n" +
+    "              <br>\n" +
+    "              Note: Calls and responses for dangerous methods will\n" +
+    "              be loged.\n" +
     "              </span>\n" +
-    "              <span style=\"font-size: 12px\"> Note: Calls and responses for dangerous methods will\n" +
-    "              be logged.</span>\n" +
     "              <div>\n" +
-    "                <input type=\"checkbox\" ng-model=\"$root.DontShowMessage\">Don't show this again.</input>\n" +
-    "                <button ng-click=\"tryIt(methodInfo.ev); methodInfo.warn = false;\">OK</button>\n" +
-    "                <button ng-click=\"methodInfo.warn = false;\">Cancel</button>\n" +
+    "                <div class=\"raml-console-dontShow\"><input type=\"checkbox\" ng-model=\"$root.DontShowMessage\"/><span>Don't show this again.</span></div>\n" +
+    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-delete\" ng-click=\"tryIt(methodInfo.ev); methodInfo.warn = false;\">OK</button>\n" +
+    "                <button class=\"raml-console-sidebar-action raml-console-sidebar-action-clear\" ng-click=\"methodInfo.warn = false;\">Cancel</button>\n" +
     "              </div>\n" +
     "            </div>\n" +
     "          </div>\n" +
@@ -6234,10 +6243,12 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "              </div>\n" +
     "            </section>\n" +
     "          </div>\n" +
-    "      </div>\n" +
+    "        </div>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "</form>\n"
+    "  {{checkIfTryAvalible()}}\n" +
+    "</form>\n" +
+    "\n"
   );
 
 
@@ -6271,7 +6282,7 @@ angular.module('ramlConsoleApp').run(['$templateCache', function($templateCache)
     "        <div class=\"raml-console-resource-path-container\" ng-init=\"index=$index\" ng-class=\"{'raml-console-resource-with-description': resource.description}\">\n" +
     "          <button class=\"raml-console-resource-root-toggle\" ng-class=\"{'raml-console-is-active': aRes.collapsed}\" ng-if=\"aRes.resources.length > 1\" ng-click=\"toggle($event, aRes)\"></button>\n" +
     "\n" +
-    "          <h2 class=\"raml-console-resource-heading raml-console-resource-heading-large\">\n" +
+    "          <h2 class=\"raml-console-resource-heading raml-console-resource-heading-large\" ng-init=\"scrollToGroup(resource.pathSegments)\">\n" +
     "            <a ng-if=\"aRes.resources.length > 1\" class=\"raml-console-resource-path-active\" ng-class=\"{'raml-console-resource-heading-hover':aRes.resources.length > 1}\" ng-repeat='segment in resource.pathSegments' ng-click=\"toggle($event, aRes)\">{{segment.toString()}}</a>\n" +
     "\n" +
     "            <a ng-if=\"aRes.resources.length <= 1\" style=\"cursor: default;\" class=\"raml-console-resource-path-active\" ng-repeat='segment in resource.pathSegments'>{{segment.toString()}}</a>\n" +

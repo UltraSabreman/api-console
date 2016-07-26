@@ -5,7 +5,7 @@
         <div class="raml-console-resource-path-container" ng-init="index=$index" ng-class="{'raml-console-resource-with-description': resource.description}">
           <button class="raml-console-resource-root-toggle" ng-class="{'raml-console-is-active': aRes.collapsed}" ng-if="aRes.resources.length > 1" ng-click="toggle($event, aRes)"></button>
 
-          <h2 class="raml-console-resource-heading raml-console-resource-heading-large">
+          <h2 class="raml-console-resource-heading raml-console-resource-heading-large" ng-init="scrollToGroup(resource.pathSegments)">
             <a ng-if="aRes.resources.length > 1" class="raml-console-resource-path-active" ng-class="{'raml-console-resource-heading-hover':aRes.resources.length > 1}" ng-repeat='segment in resource.pathSegments' ng-click="toggle($event, aRes)">{{segment.toString()}}</a>
 
             <a ng-if="aRes.resources.length <= 1" style="cursor: default;" class="raml-console-resource-path-active" ng-repeat='segment in resource.pathSegments'>{{segment.toString()}}</a>

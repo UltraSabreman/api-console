@@ -6,7 +6,7 @@
       restrict: 'E',
       templateUrl: 'directives/sidebar.tpl.html',
       replace: true,
-      controller: ['$scope', '$timeout', '$rootScope', '$http', function ($scope, $timeout, $rootScope, $http) {
+      controller: ['$scope', '$timeout', '$rootScope', '$http', '$window', function ($scope, $timeout, $rootScope, $http, $window) {
         var defaultSchemaKey = Object.keys($scope.securitySchemes).sort()[0];
         var defaultSchema    = $scope.securitySchemes[defaultSchemaKey];
         var defaultAccept    = 'application/json';
@@ -84,7 +84,7 @@
           if (!$scope.methodInfo.CanTry) {
             var obj = {
               IS_REQUEST: false,
-              USER: $rootScope._currentUser,
+              USER: $window._currentUser,
               RESPONCE: jqXhr,
               ERROR: err
             };
@@ -113,18 +113,6 @@
           $scope.showMoreEnable  = true;
           $scope.showSpinner     = false;
           $scope.responseDetails = true;
-
-          // If the response fails because of CORS, responseText is null
-          var editorHeight = 50;
-
-          if (jqXhr && jqXhr.responseText) {
-            var lines = $scope.response.body.split('\n').length;
-            editorHeight = lines > 100 ? 2000 : 25*lines;
-          }
-
-          $scope.editorStyle = {
-            height: editorHeight + 'px'
-          };
 
           apply();
 
@@ -445,7 +433,7 @@
             if (!$scope.methodInfo.CanTry) {
               var obj = {
                 IS_REQUEST: true,
-                USER: $rootScope._currentUser,
+                USER: $window._currentUser,
                 HTTPType: $scope.methodInfo.method,
                 URL: url,
                 PARAMS: $scope.parameters,
@@ -640,8 +628,9 @@
           $scope.showResponseMetadata = !$scope.showResponseMetadata;
         };
 
+
         $scope.checkIfTryAvalible = function() {
-          if ($scope.methodInfo !== undefined ) {
+          if ($scope.methodInfo !== undefined && ($scope.methodInfo.CanTry || $scope.methodInfo.CanTry === undefined)) {
             if ($scope.methodInfo.description !== undefined) {
               var index = $scope.methodInfo.description.indexOf('[[NOTSAFE]]');
               if (index !== -1) {
@@ -653,7 +642,6 @@
             }
           }
         };
-        $scope.checkIfTryAvalible();
       }]
     };
   };

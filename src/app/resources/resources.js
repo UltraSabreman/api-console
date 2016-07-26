@@ -9,7 +9,7 @@
       scope: {
         src: '@'
       },
-      controller: ['$scope', '$window', '$attrs', /*'$rootScope', '$location',*/ function($scope, $window, $attrs/*, $rootScope, $location*/) {
+      controller: ['$scope', '$window', '$attrs', '$anchorScroll', '$location', function($scope, $window, $attrs, $anchorScroll, $location) {
         $scope.proxy                  = $window.RAML.Settings.proxy;
         $scope.disableTitle           = false;
         $scope.resourcesCollapsed     = false;
@@ -123,6 +123,23 @@
           return $scope.raml.resourceGroups.filter(function (el) {
             return el.length > 1;
           }).length > 0;
+        };
+
+        $scope.scrollToGroup = function(name) {
+          var ourName = name.toString().replace(/,/g,'');
+          var loc = $location.search();
+          var target;
+          if (loc.hasOwnProperty('method')) {
+            target = decodeURIComponent(loc.method);
+          } else {
+            return;
+          }
+          if (ourName === target) {
+            var hash = jQuery.trim(target.toString().replace(/\W/g, ' ')).replace(/\s+/g, '_');
+            $location.hash(hash);
+            $anchorScroll();
+            //$location.hash('_');
+          }
         };
 
         ramlParserWrapper.onParseError(function(error) {

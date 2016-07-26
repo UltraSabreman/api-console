@@ -3,7 +3,7 @@
       <div class="raml-console-sidebar-content">
         <header class="raml-console-sidebar-row raml-console-sidebar-header">
           <h3 class="raml-console-sidebar-head">
-            "Try It"
+            Try It
             <a ng-if="!singleView" class="raml-console-sidebar-fullscreen-toggle" ng-click="collapseSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
             <a ng-if="!singleView" class="raml-console-sidebar-collapse-toggle" ng-click="closeSidebar($event)"><div class="raml-console-close-sidebar">&times;</div></a>
 
@@ -16,7 +16,6 @@
             </a>
           </h3>
         </header>
-
         <div class="raml-console-sidebar-content-wrapper">
           <section ng-if="raml.protocols.length > 1">
             <header class="raml-console-sidebar-row raml-console-sidebar-subheader raml-console-sidebar-subheader-top">
@@ -112,13 +111,15 @@
               <span class="raml-console-warn-desc">
               The call you're about to try <b>WILL</b> modify data
               on your servers! Click OK if you understand and are willing to continue.
+              <br>
+              <br>
+              Note: Calls and responses for dangerous methods will
+              be loged.
               </span>
-              <span style="font-size: 12px"> Note: Calls and responses for dangerous methods will
-              be logged.</span>
               <div>
-                <input type="checkbox" ng-model="$root.DontShowMessage">Don't show this again.</input>
-                <button ng-click="tryIt(methodInfo.ev); methodInfo.warn = false;">OK</button>
-                <button ng-click="methodInfo.warn = false;">Cancel</button>
+                <div class="raml-console-dontShow"><input type="checkbox" ng-model="$root.DontShowMessage"/><span>Don't show this again.</span></div>
+                <button class="raml-console-sidebar-action raml-console-sidebar-action-delete" ng-click="tryIt(methodInfo.ev); methodInfo.warn = false;">OK</button>
+                <button class="raml-console-sidebar-action raml-console-sidebar-action-clear" ng-click="methodInfo.warn = false;">Cancel</button>
               </div>
             </div>
           </div>
@@ -197,7 +198,9 @@
               </div>
             </section>
           </div>
-      </div>
+        </div>
     </div>
   </div>
+  {{checkIfTryAvalible()}}
 </form>
+

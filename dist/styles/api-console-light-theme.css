@@ -2301,6 +2301,27 @@ a.raml-console-resource-path-active {
   margin-top: -1px;
 }
 
+.raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-fullscreen {
+  background-color: #0B88B9 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-fullscreen button {
+  background-color: #0B88B9 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-fullscreen:hover {
+  background: #0a76a1 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #0a76a1 !important;
+}
+
 .raml-console-resource-panel.raml-console-is-active-get .raml-console-sidebar-controls-collapse {
   margin-right: 1px;
   background-color: #0B88B9 !important;
@@ -2367,6 +2388,27 @@ a.raml-console-resource-path-active {
   background-color: #e08ced;
   color: white;
   margin-top: -1px;
+}
+
+.raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-fullscreen {
+  background-color: #87538f !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-fullscreen button {
+  background-color: #87538f !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-fullscreen:hover {
+  background: #784a7f !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #784a7f !important;
 }
 
 .raml-console-resource-panel.raml-console-is-active-put .raml-console-sidebar-controls-collapse {
@@ -2437,6 +2479,27 @@ a.raml-console-resource-path-active {
   margin-top: -1px;
 }
 
+.raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-fullscreen {
+  background-color: #1EA18D !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-fullscreen button {
+  background-color: #1EA18D !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-fullscreen:hover {
+  background: #1a8c7a !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #1a8c7a !important;
+}
+
 .raml-console-resource-panel.raml-console-is-active-post .raml-console-sidebar-controls-collapse {
   margin-right: 1px;
   background-color: #1EA18D !important;
@@ -2503,6 +2566,27 @@ a.raml-console-resource-path-active {
   background-color: #ff8082;
   color: white;
   margin-top: -1px;
+}
+
+.raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-fullscreen {
+  background-color: #d14956 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-fullscreen button {
+  background-color: #d14956 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-fullscreen:hover {
+  background: #cc3543 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #cc3543 !important;
 }
 
 .raml-console-resource-panel.raml-console-is-active-delete .raml-console-sidebar-controls-collapse {
@@ -2573,6 +2657,27 @@ a.raml-console-resource-path-active {
   margin-top: -1px;
 }
 
+.raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-fullscreen {
+  background-color: #1EBD77 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-fullscreen button {
+  background-color: #1EBD77 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-fullscreen:hover {
+  background: #1ba769 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #1ba769 !important;
+}
+
 .raml-console-resource-panel.raml-console-is-active-options .raml-console-sidebar-controls-collapse {
   margin-right: 1px;
   background-color: #1EBD77 !important;
@@ -2639,6 +2744,27 @@ a.raml-console-resource-path-active {
   background-color: #bfff00;
   color: white;
   margin-top: -1px;
+}
+
+.raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-fullscreen {
+  background-color: #98B805 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-fullscreen button {
+  background-color: #98B805 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-fullscreen:hover {
+  background: #839f04 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #839f04 !important;
 }
 
 .raml-console-resource-panel.raml-console-is-active-trace .raml-console-sidebar-controls-collapse {
@@ -2709,6 +2835,27 @@ a.raml-console-resource-path-active {
   margin-top: -1px;
 }
 
+.raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-fullscreen {
+  background-color: #E48F0A !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-fullscreen button {
+  background-color: #E48F0A !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-fullscreen:hover {
+  background: #cc8009 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #cc8009 !important;
+}
+
 .raml-console-resource-panel.raml-console-is-active-connect .raml-console-sidebar-controls-collapse {
   margin-right: 1px;
   background-color: #E48F0A !important;
@@ -2777,6 +2924,27 @@ a.raml-console-resource-path-active {
   margin-top: -1px;
 }
 
+.raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-fullscreen {
+  background-color: #8A45A2 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-fullscreen button {
+  background-color: #8A45A2 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-fullscreen:hover {
+  background: #7b3d90 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #7b3d90 !important;
+}
+
 .raml-console-resource-panel.raml-console-is-active-head .raml-console-sidebar-controls-collapse {
   margin-right: 1px;
   background-color: #8A45A2 !important;
@@ -2843,6 +3011,27 @@ a.raml-console-resource-path-active {
   background-color: #caf2fc;
   color: white;
   margin-top: -1px;
+}
+
+.raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-fullscreen {
+  background-color: #02B0E2 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-fullscreen * {
+  color: white !important;
+  fill: white !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-fullscreen button {
+  background-color: #02B0E2 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-fullscreen:hover {
+  background: #029cc9 !important;
+}
+
+.raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-fullscreen:hover button {
+  background: #029cc9 !important;
 }
 
 .raml-console-resource-panel.raml-console-is-active-patch .raml-console-sidebar-controls-collapse {
@@ -3268,6 +3457,12 @@ a.raml-console-resource-path-active {
   transform: translate(-50%, -50%);
   display: flex;
   flex-flow: column;
+  border-radius: 3px;
+  border: 1px solid black;
+}
+
+.raml-console-danger .raml-console-box h3 {
+  color: red;
 }
 
 .raml-console-danger .raml-console-box h1 {
@@ -3280,18 +3475,32 @@ a.raml-console-resource-path-active {
 
 .raml-console-danger .raml-console-box div {
   flex: 0 0 auto;
+  display: flex;
+  flex-flow: row;
 }
 
 .raml-console-danger .raml-console-box div button {
-  position: relative;
-  float: right;
-  bottom: 0;
+  flex: 0 0 auto;
   margin-left: 5px;
 }
 
-.raml-console-danger .raml-console-box div input {
-  height: 14px;
-  margin-right: 5px;
+.raml-console-danger .raml-console-box div .raml-console-dontShow {
+  flex: 1 1 auto;
+  margin-top: 25px;
+  width: auto;
+  height: 20px;
+}
+
+.raml-console-danger .raml-console-box div .raml-console-dontShow input {
+  height: 20px;
+  margin-top: 2px;
+  margin-right: 10px;
+}
+
+.raml-console-danger .raml-console-box div .raml-console-dontShow span {
+  line-height: 20px;
+  height: 20px;
+  font-size: 20px;
 }
 
 .raml-console-sidebar-url-segment {
@@ -4564,7 +4773,7 @@ span.raml-console-side-bar-required-field {
 }
 
 .raml-console-spinner::after {
-  content: 'loading RAML';
+  content: 'loading';
   font-size: 13px;
 }
 

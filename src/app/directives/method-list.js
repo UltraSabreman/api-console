@@ -172,6 +172,8 @@
 
               // call $anchorScroll()
               $anchorScroll();
+
+              //$location.hash('');
             }, 10);
 
           } else if (jQuery($this).hasClass('raml-console-is-active')) {
@@ -197,7 +199,7 @@
 
         //This function is ran to get the only method tabs that are appropriate to our spesific method.
         $scope.init = function(last) {
-            if(!last) { return; }
+          if(!last) { return; }
             $scope.ourButtons = jQuery('.raml-console-init-tab');
             $scope.ourButtons.attr('class', $scope.ourButtons.attr('class').replace('raml-console-init-tab', ''));
             $scope.checkIfExpanded();
@@ -213,14 +215,15 @@
           });
 
           newLocation.method = $scope.resource.toString();
-          newLocation.type = $scope.resource.methods[index].method.toLowerCase();
+          if (index !== -1) {
+            newLocation.type = $scope.resource.methods[index].method.toLowerCase();
+          }
           $location.path($location.path()).search(newLocation);
         };
 
         //This fucntions checks to see if we need to exapnd one of these tabs.
-        //TODO: if found, reset location so we dont look again.
         $scope.checkIfExpanded = function() {
-            var loc = $location.search();
+          var loc = $location.search();
             var target;
             if (loc.hasOwnProperty('method')) {
                 target = decodeURIComponent(loc.method);
@@ -231,17 +234,26 @@
             if (loc.hasOwnProperty('type')) {
                 type = loc.type;
             }
-            var foundIndex = -1;
 
-            for (var i = 0; i < $scope.resource.methods.length; i++) {
-              if ($scope.resource.methods[i].method.toLowerCase() === type.toLowerCase()) {
-                foundIndex = i;
-                break;
+            if ( $scope.resource.toString() === target) {
+              var foundIndex = -1;
+
+              for (var i = 0; i < $scope.resource.methods.length; i++) {
+                if ($scope.resource.methods[i].method.toLowerCase() === type.toLowerCase()) {
+                  foundIndex = i;
+                  break;
+                }
               }
-            }
 
-            if (foundIndex !== -1 && $scope.resource.toString() === target) {
-              $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
+
+              if (foundIndex !== -1) {
+                $scope.showResource({currentTarget: $scope.ourButtons[foundIndex]}, foundIndex);
+              } else {
+                var hash = $scope.generateId(target);
+                $location.hash(hash);
+                $anchorScroll();
+                //$location.hash('');
+              }
             }
         };
       }]
