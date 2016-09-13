@@ -12,7 +12,27 @@
         type: '@',
         title: '@'
       },
-      controller: ['$scope', '$attrs', function ($scope, $attrs) {
+      controller: ['$scope', '$attrs', '$window', function ($scope, $attrs, $window) {
+        $scope.qVals = [];
+
+        $scope.encode = function(str) {
+          return $window.encodeURIComponent(str);
+        };
+        /*$scope.test = function() {
+          //if (!last) {return;}
+          $scope.qVals = [];
+          //console.log($scope.$parent.raml.baseUri.toString());
+          //console.log($scope.$parent.raml.baseUri.tokens.toString());
+          console.log($scope.context);
+          console.log($scope.$parent.methodInfo);
+          //console.log($scope.context.queryParameters.plain)
+          Object.keys($scope.context.queryParameters.plain).forEach(function(x) {
+            $scope.qVals.push({key: x, val: $scope.context.queryParameters.values[x][0]});
+          });
+
+          console.log($scope.qVals);
+        };*/
+
         $scope.markedOptions = RAML.Settings.marked;
 
         if ($attrs.hasOwnProperty('enableCustomParameters')) {
@@ -47,6 +67,7 @@
               templated: element.templated && typeof element.parameters[tokens[i]] !== 'undefined' ? true : false
             });
           }
+
         });
 
         $scope.addCustomParameter = function () {
@@ -54,9 +75,7 @@
         };
 
         $scope.removeCutomParam = function (param) {
-          $scope.context.customParameters[$scope.type] = $scope.context.customParameters[$scope.type].filter(function (el) {
-            return el.name !== param.name;
-          });
+          $scope.context.customParameters[$scope.type].splice($scope.context.customParameters[$scope.type].indexOf(param), 1);
         };
       }]
     };

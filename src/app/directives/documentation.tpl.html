@@ -52,10 +52,12 @@
     </section>
 
     <section class="raml-console-resource-section raml-console-documentation-schemes">
-      <h3 class="raml-console-resource-heading-a">Security Schemes</h3>
+      <!--TODO: somehow make this conditional so we dont have to worry about this in the future-->
+      <!--TODO: show when this call needs and auth header.-->
+      <!--<h3 class="raml-console-resource-heading-a">Security Schemes</h3>
       <ol class="raml-console-documentation-security-scheme">
         <li class="raml-console-documentation-scheme" ng-class="{'raml-console-is-active':isSchemeSelected(value)}" ng-click="selectDocumentationScheme(value)" ng-repeat="(key, value) in securitySchemes">{{value.name}}</li>
-      </ol>
+      </ol>-->
 
       <p ng-if="documentationSchemeSelected.description" markdown="documentationSchemeSelected.description" class="raml-console-marked-content"></p>
 
@@ -113,7 +115,7 @@
       </h3>
 
       <h4 class="raml-console-request-body-heading">
-        <span ng-click="changeResourceBodyType($event, key)" ng-class="{ 'raml-console-is-active' : bodySelected(key)}" class="raml-console-flag raml-console-body-{{getBodyId(key)}}" ng-repeat="(key, value) in methodInfo.body">{{key}}</span>
+        <span ng-hide="$first && $last" ng-click="changeResourceBodyType($event, key)" ng-class="{ 'raml-console-is-active' : bodySelected(key)}" class="raml-console-flag raml-console-body-{{getBodyId(key)}}" ng-repeat="(key, value) in methodInfo.body">{{key}}</span>
       </h4>
 
       <section ng-if="methodInfo.body[currentBodySelected].formParameters">
@@ -191,7 +193,7 @@
         <div class="raml-console-resource-response" ng-if="methodInfo.responses[code].body">
           <h4 class="raml-console-resource-body-heading">
             Body
-            <span ng-click="changeType($event, key, code)" ng-class="{ 'raml-console-is-active': $first}" class="raml-console-flag" ng-repeat="(key, value) in methodInfo.responses[code].body">{{key}}</span>
+            <span ng-hide="$first && $last" ng-click="changeType($event, key, code)" ng-class="{ 'raml-console-is-active': $first}" class="raml-console-flag" ng-repeat="(key, value) in methodInfo.responses[code].body">{{key}}</span>
           </h4>
 
           <div ng-if="responseInfo[code][responseInfo[code].currentType].example">
@@ -207,7 +209,7 @@
           </div>
 
           <div class="raml-console-schema-container" ng-if="responseInfo[code][responseInfo[code].currentType].schema">
-            <p><button ng-click="showSchema($event)" class="raml-console-resource-btn">Show Schema</button></p>
+            <p><button ng-click="showSchema($event); refreshCodeMirror()" class="raml-console-resource-btn">Show Schema</button></p>
             <div  class="raml-console-resource-pre raml-console-resource-pre-toggle" ui-codemirror="{
               lineNumbers: true,
               tabSize: 2,

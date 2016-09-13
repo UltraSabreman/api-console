@@ -67,11 +67,11 @@
         }
 
         function beautify(body, contentType) {
-          if(contentType.indexOf('json')) {
+          if(contentType.indexOf('json') !== -1) {
             body = vkbeautify.json(body, 2);
           }
 
-          if(contentType.indexOf('xml')) {
+          if(contentType.indexOf('xml') !== -1) {
             body = vkbeautify.xml(body, 2);
           }
 
@@ -104,6 +104,8 @@
               $scope.response.body = beautify(jqXhr.responseText, $scope.response.contentType);
             }
             catch (e) {
+              console.error('failed to buet');
+              console.error(e);
               $scope.response.body = jqXhr.responseText;
             }
             $scope.response.body += '\n';
@@ -214,6 +216,16 @@
         $scope.prefillBody = function (current) {
           var definition   = $scope.context.bodyContent.definitions[current];
           definition.value = definition.contentType.example;
+        };
+
+        $scope.refreshCodeMirror = function() {
+          jQuery('.CodeMirror').each(function(i, el){
+            //console.log(el.CodeMirror.getDoc().getValue())
+            //console.log()
+            el.CodeMirror.getDoc().setValue($scope.getBeatifiedExample(el.CodeMirror.getDoc().getValue()));
+            el.CodeMirror.refresh();
+
+          });
         };
 
         $scope.clearFields = function () {
@@ -379,6 +391,47 @@
           }
         };
 
+        $scope.encodeUri = function(str) {
+          var temp = str;
+          $scope.model[0] = '';
+
+
+          temp = temp.replace(/\//g, '|F');
+          temp = temp.replace(/\\/g, '|B');
+          temp = temp.replace(/#/g, '|P');
+          temp = temp.replace(/:/g, '|C');
+          temp = temp.replace(/\+/g, '|A');
+          temp = temp.replace(/\&/g, '|M');
+          temp = temp.replace(/\*/g, '|S');
+          temp = temp.replace(/%/g, '|H');
+          temp = $window.encodeURIComponent(temp);
+
+          return temp;
+        };
+
+        $scope.isUri = function(thing) {
+          if (!thing) {
+            return false;
+          }
+          var splitUri = thing.split(',');
+          if (splitUri.length !== 2) {
+            return false;
+          }
+
+          if (!splitUri[1].match(/.+\/.+/)) {
+            return false;
+          }
+
+          /*if (!$scope.isUrl(splitUri[0])) {
+           return false;
+           }*/
+          if (splitUri[0].indexOf('/') === -1) {
+            return false;
+          }
+
+          return true;
+        };
+
         $scope.tryIt = function ($event) {
           $scope.requestOptions  = null;
           $scope.responseDetails = false;
@@ -419,6 +472,14 @@
             var request = RAML.Client.Request.create(url, $scope.methodInfo.method);
 
             $scope.parameters = getParameters(context, 'queryParameters');
+
+
+            Object.keys($scope.parameters).forEach(function(thing) {
+              console.log($scope.parameters[thing][0]);
+              if ($scope.isUri($scope.parameters[thing][0])) {
+                $scope.parameters[thing][0] = $scope.encodeUri($scope.parameters[thing][0]);
+              }
+            });
 
             request.queryParams($scope.parameters);
             request.header('Accept', $scope.raml.mediaType || defaultAccept);

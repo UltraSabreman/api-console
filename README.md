@@ -1,6 +1,8 @@
 This is a modification of the [RAML Console Prject](https://github.com/mulesoft/api-console) designed to suite the needs of our special project. Modifications are listed bellow:
 * Allow the console to detect changes to it's 'src' attribute and reload the RAML files accordingly.
 
+**Warning**: Before running `bower install` be sure to back-up the praser mods in the bower-componenets folder and replace them when done.
+This allows the parser to parse querey parameters with an "=" in them. If you do not need this functionality, ignore this warning.
 # RAML Console
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/mulesoft/api-console?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

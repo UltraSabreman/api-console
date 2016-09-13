@@ -13,14 +13,19 @@
       <input name="custom-header" class="raml-console-sidebar-input raml-console-sidebar-input-custom" placeholder="custom value" ng-model="customParam.value">
     </p>
 
-    <p ng-show="showBaseUrl" class="raml-console-sidebar-method">{{$parent.methodInfo.method.toUpperCase()}}</p>
-    <div ng-show="showBaseUrl" class="raml-console-sidebar-method-content">
-      <div class="raml-console-sidebar-url" ng-repeat="segment in segments">
-        <div ng-hide="segment.templated">{{segment.name}}</div>
-        <div ng-show="segment.templated" ng-if="context[type].values[segment.name][0]" class="raml-console-sidebar-url-segment">{{context[type].values[segment.name][0]}}</div>
-        <div ng-show="segment.templated" ng-if="!context[type].values[segment.name][0]" class="raml-console-sidebar-url-segment"><span ng-non-bindable>&#123;</span>{{segment.name}}<span ng-non-bindable>&#125;</span></div>
-      </div>
-    </div>
+    <ul ng-show="showBaseUrl" class="raml-console-sidebar-method-content"> <!--init="test()"-->
+      <li ng-show="showBaseUrl" class="raml-console-sidebar-method raml-console-sidebar-url-segment raml-console-sidebar-url-bold">{{$parent.methodInfo.method.toUpperCase()}}</li>
+      <li ng-repeat="segment in segments" class="raml-console-sidebar-url-segment">
+        <span ng-hide="segment.templated">{{segment.name}}</span>
+        <span ng-show="segment.templated" ng-if="context[type].values[segment.name][0]" class="raml-console-sidebar-url-bold">{{encode(context[type].values[segment.name][0])}}</span>
+        <span ng-show="segment.templated" ng-if="!context[type].values[segment.name][0]" class="raml-console-sidebar-url-bold"><span ng-non-bindable>&#123;</span>{{segment.name}}<span ng-non-bindable>&#125;</span></span>
+      </li>
+      <!--<li ng-if="qVals.length > 0" class="raml-console-sidebar-url-segment">?</li>
+      <li ng-if="qVals.length > 0" ng-repeat="param in qVals" class="raml-console-sidebar-url-segment">
+        <span ng-if="param.val"> {{param.key}}=<span class="raml-console-sidebar-url-bold">{{encode(param.val)}}</span></span>
+        <span ng-if="!param.val" ><code ng-non-bindable>{</code>{{param.key}}=<span class="raml-console-sidebar-url-bold">{{encode(param.key)}}}</span><code ng-non-bindable>}</code></span>
+      </li>-->
+    </ul>
 
     <p class="raml-console-sidebar-input-container" ng-repeat="param in context[type].plain">
       <span class="raml-console-sidebar-input-tooltip-container" ng-if="param.definitions[0].description" ng-class="{'raml-console-sidebar-input-tooltip-container-enum': param.definitions[0].enum}">

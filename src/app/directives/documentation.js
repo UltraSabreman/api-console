@@ -218,7 +218,9 @@
 
         $scope.refreshCodeMirror = function() {
           jQuery('.CodeMirror').each(function(i, el){
+            el.CodeMirror.getDoc().setValue($scope.getBeatifiedExample(el.CodeMirror.getDoc().getValue()));
             el.CodeMirror.refresh();
+
           });
         };
       }]
